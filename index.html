@@ -1,0 +1,130 @@
+<!doctype html>
+<html
+  lang="en"
+  class="
+    bg-black
+    text-white
+  ">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>sprio</title>
+    <style>
+      [x-cloak] {
+        display: none;
+      }
+    </style>
+  </head>
+  <body x-cloak x-data="initAlpine()" x-init="init">
+    <div
+      class="
+        -translate-x-1/2
+        -translate-y-1/2
+        absolute
+        font-sans
+        font-thin
+        left-1/2
+        text-6xl
+        text-white
+        top-1/2
+        tracking-wider
+        transform
+      "
+      style="z-index: 100;"
+      x-show="!initAnimationTriggered"
+      x-transition:leave-end="opacity-0 scale-150"
+      x-transition:leave-start="opacity-100 scale-100 tracking-wider"
+      x-transition:leave="transition-all ease-in duration-700 transform"
+      x-ref="initAnimation"
+    >
+      spiro
+    </div>
+    <canvas
+      @click="$store.sideMenu.close()"
+      class="
+        absolute
+        h-full
+        left-0
+        margin-0
+        padding-0
+        top-0
+        w-full
+      "
+      style="z-index: 0; background-color: #000;"
+    ></canvas>
+    <div
+      @click="$store.sideMenu.toggle()"
+      :class="{
+        'rotate-0': !$store.sideMenu.isOpen,
+        'rotate-180': $store.sideMenu.isOpen,
+        'translate-x-56': $store.sideMenu.isOpen,
+      }"
+      class="
+        -left-full
+        absolute
+        duration-300
+        ease-in-out
+        origin-left-center
+        p-3
+        transition-all
+      "
+      style="z-index: 2;"
+      x-data="chevronComponent()"
+      x-ref="chevron"
+    >
+      <span
+        :style="{
+          opacity: opacity,
+        }"
+        id="chevron"
+        class="
+          cursor-pointer
+          duration-300
+          font-bold
+          select-none
+          text-white
+          text-xl
+        "
+        x-html="chevronSymbol"
+        x-init="init()"
+      ></span>
+    </div>
+
+    <div
+      :class="{
+        '-translate-x-full': !$store.sideMenu.isOpen,
+        'translate-x-0': $store.sideMenu.isOpen,
+      }"
+      class="
+        absolute
+        bg-gray-800
+        duration-300
+        ease-in-out
+        h-full
+        left-0
+        origin-left
+        overflow-y-auto
+        text-sm
+        top-0
+        transition-transform
+        w-64
+      "
+      id="side-menu"
+      style="z-index: 1;"
+      x-data="sideMenuComponent()"
+    >
+      <!-- Menu Header -->
+      <div class="p-4 bg-gray-800 text-white">
+        Settings
+      </div>
+    
+      <!-- Menu Items -->
+      <ul class="bg-gray-700 text-white">
+        <li class="p-4 hover:bg-gray-600 cursor-pointer" @click="toggleFullScreen()">Full Screen</li>
+        <li class="p-4 hover:bg-gray-600 cursor-pointer" @click="anotherAction()">Item 2</li>
+        <!-- Add more items here -->
+      </ul>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
