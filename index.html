@@ -1,100 +1,54 @@
 <!doctype html>
-<html
-  lang="en"
-  class="
-    bg-black
-    text-white
-  ">
+<html lang="en" x-data="globalSettings()" :class="{ 'invert': !isDarkMode }">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>sprio</title>
     <style>
+      /* Can't be in styles.css because it needs to be loaded before page is rendered */
       [x-cloak] {
         display: none;
       }
     </style>
   </head>
-  <body x-cloak x-data="initAlpine()" x-init="init">
+  <body x-cloak x-data="initAlpine()" x-init="init" class="overflow-hidden" :class="{
+      'cursor-none': !isActive && $store.canvas.isFullScreen(),
+    }">
     <div
       class="
-        -translate-x-1/2
-        -translate-y-1/2
-        absolute
-        font-sans
-        font-thin
-        left-1/2
-        text-6xl
+        absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50
+        font-sans font-thin text-6xl tracking-wider
         text-white
-        top-1/2
-        tracking-wider
         transform
       "
-      style="z-index: 100;"
       x-show="!initAnimationTriggered"
       x-transition:leave-end="opacity-0 scale-150"
       x-transition:leave-start="opacity-100 scale-100 tracking-wider"
       x-transition:leave="transition-all ease-in duration-700 transform"
       x-ref="initAnimation"
     >
-      spiro
+      SPIRO
     </div>
     <canvas
-      @click="$store.sideMenu.close()"
+      @click="$dispatch('escape')"
       class="
-        absolute
-        h-full
-        left-0
-        margin-0
-        padding-0
-        top-0
-        w-full
+        absolute left-0 top-0 z-0
+        w-full h-full
+        m-0 p-0
       "
-      style="z-index: 0; background-color: #000;"
+      style="background-color: #000; /* Needed for reading color from style in code */"
+      x-data="canvasComponent()"
+      x-ref="canvas"
     ></canvas>
-    <div
-      @click="$store.sideMenu.toggle()"
-      :class="{
-        'rotate-0': !$store.sideMenu.isOpen,
-        'rotate-180': $store.sideMenu.isOpen,
-        'translate-x-56': $store.sideMenu.isOpen,
-      }"
-      class="
-        -left-full
-        absolute
-        duration-300
-        ease-in-out
-        origin-left-center
-        p-3
-        transition-all
-      "
-      style="z-index: 2;"
-      x-data="chevronComponent()"
-      x-ref="chevron"
-    >
-      <span
-        :style="{
-          opacity: opacity,
-        }"
-        id="chevron"
-        class="
-          cursor-pointer
-          duration-300
-          font-bold
-          select-none
-          text-white
-          text-xl
-        "
-        x-html="chevronSymbol"
-        x-init="init()"
-      ></span>
-    </div>
+
+    <div id="fps-display"></div>
 
     <div
       :class="{
         '-translate-x-full': !$store.sideMenu.isOpen,
         'translate-x-0': $store.sideMenu.isOpen,
       }"
+      @escape.window="$store.sideMenu.isOpen = false"
       class="
         absolute
         bg-gray-800
@@ -103,28 +57,612 @@
         h-full
         left-0
         origin-left
-        overflow-y-auto
+        overflow-visible
         text-sm
         top-0
         transition-transform
         w-64
+        z-20
       "
       id="side-menu"
-      style="z-index: 1;"
-      x-data="sideMenuComponent()"
     >
-      <!-- Menu Header -->
-      <div class="p-4 bg-gray-800 text-white">
-        Settings
+
+
+      <div
+        @click="$store.sideMenu.isOpen = !$store.sideMenu.isOpen"
+        class="flex items-center justify-between p-2 bg-gray-800 text-white hover:bg-gray-600 cursor-pointer"
+      >
+        <p>Settings</p>
+        <span
+          :class="{
+            '-left-full': !initAnimationStarted,
+            'opacity-0': !isActive,
+            'opacity-80 hover:opacity-100': isActive && !$store.sideMenu.isOpen,
+            'relative': !($store.sideMenu.isOpen && initAnimationStarted),
+            'translate-x-12': !$store.sideMenu.isOpen && initAnimationStarted,
+            'rotate-0': !$store.sideMenu.isOpen,
+            'rotate-180': $store.sideMenu.isOpen,
+          }"
+          class="
+            transition-transform
+            mr-4
+            text-xl font-bold
+            text-white
+            select-none cursor-pointer
+            duration-300
+          "
+        >
+         ›
+        </span>
       </div>
-    
-      <!-- Menu Items -->
-      <ul class="bg-gray-700 text-white">
-        <li class="p-4 hover:bg-gray-600 cursor-pointer" @click="toggleFullScreen()">Full Screen</li>
-        <li class="p-4 hover:bg-gray-600 cursor-pointer" @click="anotherAction()">Item 2</li>
-        <!-- Add more items here -->
-      </ul>
+      <div
+        class="
+          flex items-center justify-between
+          p-2
+          bg-gray-700 text-white hover:bg-gray-600
+          cursor-pointer
+        "
+        @click="$store.canvas.toggleFullScreen()"
+      >
+        <div>
+          <p>Full Screen</p>
+        </div>
+        <div
+          :class="{
+            '-left-full': !initAnimationStarted,
+            'opacity-0': !isActive,
+            'opacity-80 hover:opacity-100': isActive && !$store.sideMenu.isOpen,
+            'relative': !($store.sideMenu.isOpen && initAnimationStarted),
+            'translate-x-16': (!$store.sideMenu.isOpen && initAnimationStarted),
+          }"
+          class="
+            inline-block
+            align-middle
+            w-10
+            mr-2
+            transition duration-200 ease-in
+            overflow-visible select-none
+            slide-in
+          "
+        >
+          <div class="full-screen-icon translate-x-2 w-6 h-6"></div>
+        </div>
+      </div>
+
+      <div
+        id="darkModeContainer"
+        class="toggle-container"
+        data-breakout="true"
+        data-label="Dark Mode"
+        data-id="darkModeToggle"
+        data-function="toggleDarkMode()"
+        data-hint="'Switch to ' + (isDarkMode ? 'light' : 'dark') + ' mode'"
+        data-icon-left="is-dark-mode-false-icon"
+        data-icon-right="is-dark-mode-true-icon"
+        data-model="isDarkMode"
+      >
+      </div>
+
+      <div
+        id="shapesModeContainer"
+        class="toggle-container"
+        data-breakout="true"
+        data-label="Spiro Type"
+        data-id="shapesModeToggle"
+        data-function="$store.canvas.toggleShapesMode()"
+        data-hint="'Switch to ' + ($store.canvas.isShapesMode ? 'shapes' : 'circles') + ' mode'"
+        data-icon-left="is-shape-mode-false-icon"
+        data-icon-right="is-shape-mode-true-icon"
+        data-model="$store.canvas.isShapesMode"
+      >
+      </div>
+
+      <div
+        class="toggle-container"
+        data-breakout="true"
+        data-function="$store.canvas.toggleAutoAdvanceMode()"
+        data-hint="'Switch to ' + ($store.canvas.isAutoAdvanceMode ? 'Single Seed' : 'Auto-Advance') + ' mode'"
+        data-id="autoAvanceModeToggle"
+        data-label="Progression"
+        data-model="$store.canvas.isAutoAdvanceMode"
+        data-text-left="1"
+        data-text-right="∞"
+        id="autoAvanceModeContainer"
+      >
+      </div>
+
+      <div
+        @click="$store.sideMenu.isAdvancedMenuOpen = !$store.sideMenu.isAdvancedMenuOpen"
+        class="flex items-center justify-between p-2 bg-gray-800 text-white hover:bg-gray-600 cursor-pointer"
+      >
+        <p>Advanced Settings</p>
+        <span
+          :class="{
+            'rotate-0': !$store.sideMenu.isAdvancedMenuOpen,
+            'rotate-90': $store.sideMenu.isAdvancedMenuOpen,
+          }"
+          class="
+            transition-transform
+            mr-4
+            text-xl font-bold
+            text-white
+            select-none cursor-pointer
+            duration-300
+          "
+        >
+         ›
+        </span>
+      </div>
+
+      <!-- Advanced Options -->
+      <div
+        x-show="$store.sideMenu.isAdvancedMenuOpen"
+        x-transition:enter="transition ease-out duration-300"
+        x-transition:enter-start="opacity-0 transform -translate-y-2"
+        x-transition:enter-end="opacity-100 transform translate-y-0"
+        x-transition:leave="transition ease-in duration-300"
+        x-transition:leave-start="opacity-100 transform translate-y-0"
+        x-transition:leave-end="opacity-0 transform -translate-y-2"
+      >
+        <div
+          id="fpsModeContainer"
+          class="toggle-container"
+          data-label="Frames per Second"
+          data-id="fpsModeToggle"
+          data-function="$store.canvas.isFpsShown = !$store.canvas.isFpsShown"
+          data-hint="'Click to ' + ($store.canvas.isFpsShown ? 'hide' : 'show') + ' FPS'"
+          data-model="$store.canvas.isFpsShown"
+        >
+        </div>
+        <div
+          id="precisionModeContainer"
+          class="toggle-container"
+          data-label="Precision"
+          data-id="precisionModeToggle"
+          data-function="$store.canvas.togglePrecisionMode()"
+          data-hint="'Switch to ' + ($store.canvas.isHighPrecisionMode ? 'Float32' : 'Float64') + ' mode'"
+          data-model="$store.canvas.isHighPrecisionMode"
+        >
+        </div>
+
+        <div
+          @click="$store.sideMenu.isExperimentalMenuOpen = !$store.sideMenu.isExperimentalMenuOpen"
+          class="flex items-center justify-between p-2 bg-gray-800 text-white hover:bg-gray-600 cursor-pointer"
+        >
+          <p>Experimental Settings</p>
+          <span
+            :class="{
+              'rotate-0': !$store.sideMenu.isExperimentalMenuOpen,
+              'rotate-90': $store.sideMenu.isExperimentalMenuOpen,
+            }"
+            class="
+              transition-transform
+              mr-4
+              text-xl font-bold
+              text-white
+              select-none cursor-pointer
+              duration-300
+            "
+          >
+          ›
+          </span>
+        </div>
+
+        <!-- Experimental Settings -->
+        <div
+          x-show="$store.sideMenu.isExperimentalMenuOpen"
+          x-transition:enter="transition ease-out duration-300"
+          x-transition:enter-start="opacity-0 transform -translate-y-2"
+          x-transition:enter-end="opacity-100 transform translate-y-0"
+          x-transition:leave="transition ease-in duration-300"
+          x-transition:leave-start="opacity-100 transform translate-y-0"
+          x-transition:leave-end="opacity-0 transform -translate-y-2"
+        >
+          <div
+            id="wasmModeContainer"
+            :disabled="!$store.canvas.isWasmModuleLoaded"
+            class="toggle-container"
+            data-function="$store.canvas.toggleWasmMode()"
+            data-hint="'Switch to ' + ($store.canvas.isWasmMode ? 'JavaScript' : 'WebAssembly') + ' mode'"
+            data-id="wasmModeToggle"
+            data-label="Execution"
+            data-model="$store.canvas.isWasmMode"
+          >
+          </div>
+          <div
+            id="velocityModeContainer"
+            class="toggle-container"
+            data-label="Velocity"
+            data-id="velocityModeToggle"
+            data-function="$store.canvas.isRenderVelocity != $store.canvas.isRenderVelocity"
+            data-hint="'Switch to ' + ($store.canvas.isRenderVelocity ? 'not' : '') + ' rendering velocity'"
+            data-model="$store.canvas.isRenderVelocity"
+          >
+          </div>
+          <!-- Rendering Smoothness Slider -->
+          <div
+            class="
+              flex items-center justify-between
+              p-2
+              text-white bg-gray-700 hover:bg-gray-600
+              cursor-pointer
+            "
+          >
+            <div>Rendering Smoothness</div>
+            <input class="w-full" type="range" min="1" max="10" step="0.1" :value="$store.canvas.renderingSmoothness**2" @input="$store.canvas.setRenderingSmoothness(Math.sqrt($event.target.valueAsNumber))">
+          </div>
+        </div>
+      </div>
+
+      <div
+        @click="$store.about.open = !$store.about.open"
+        class="flex items-center justify-between p-2 bg-gray-700 text-white hover:bg-gray-600 cursor-pointer"
+      >
+        <p>About</p>
+        <span
+          class="
+            info-icon
+            mr-4
+            h-4 w-4
+            cursor-pointer
+          "
+        >
+        </span>
+      </div>
     </div>
+
+    <!-- About Modal -->
+    <div
+      @escape.window="$store.about.open = false"
+      x-show="$store.about.open"
+      x-transition:enter="transition ease-in duration-300"
+      x-transition:enter-start="opacity-0 blur"
+      x-transition:enter-end="opacity-100"
+      x-transition:leave="transition ease-out duration-300"
+      x-transition:leave-start="opacity-100"
+      x-transition:leave-end="opacity-0 blur"
+      class="
+        fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
+        w-96 h-64
+        rounded-lg
+        backdrop-blur-lg
+      "
+    ></div>
+    <div
+      @escape.window="$store.about.open = false"
+      x-show="$store.about.open"
+      x-transition:enter="transition ease-in duration-300"
+      x-transition:enter-start="opacity-0 scale-110 blur"
+      x-transition:enter-end="opacity-100 scale-100"
+      x-transition:leave="transition ease-out duration-300"
+      x-transition:leave-start="opacity-100 scale-100"
+      x-transition:leave-end="opacity-0 scale-110 blur"
+      class="
+        fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
+        flex items-center justify-center
+        p-2
+        bg-transparent
+      "
+    >
+      <div class="bg-black bg-opacity-50 rounded-lg p-4 w-96 h-64 text-white">
+        <h4 class="text-2xl font-semibold mb-4">About Spiro</h4>
+
+        <p class="text-base mb-4">
+          <strong>Spiro</strong> is a digital art tool that visualizes a particle's chaotic orbit around a black hole. Save, load, and share your patterns using a 128-bit, BIP39 mnemonic seed using the
+          <span
+            x-data="shareButtonComponent()"
+            @click="copyURL();"
+            class="
+              fixed
+              w-3 h-3
+              mt-1
+              opacity-80 hover:opacity-100
+              cursor-pointer share-icon
+            "
+          ></span>
+          &nbsp; &nbsp;
+          button.
+        </p>
+
+        <p class="text-sm">
+          <a href="https://github.com/hvoecking/spiro" class="text-blue-400 hover:underline">Learn More on GitHub</a>
+        </p>
+
+        <p class="text-xs mt-4 text-red-400">
+          <strong>Note:</strong> Spiro seeds are not Bitcoin seeds. Do not use your Bitcoin seed here.
+        </p>
+
+        <button
+          @click="$store.about.open = false"
+          class="absolute top-0 right-2 m-2 text-white transition hover:text-gray-400"
+        >
+          ×
+        </button>
+      </div>
+    </div>
+    <div
+      :class="{
+        'opacity-0': !isActive,
+        'opacity-100': isActive,
+        'translate-x-full': !initAnimationStarted,
+      }"
+      class="
+        absolute top-0 right-0 z-10
+        p-3
+        transition duration-200 ease-in slide-in
+      "
+    >
+      <div
+        @click="$store.about.open = !$store.about.open"
+        x-show="!$store.canvas.isFpsShown"
+        class="
+          w-4 h-4
+          opacity-80 hover:opacity-100
+          cursor-pointer info-icon
+        "
+      ></div>
+    </div>
+
+    <div
+      x-data="seedComponent()"
+      @escape.window="$store.seed.isOpen = false"
+      style="font-size: 0.42em"
+      class="
+        -translate-x-1/2
+        absolute
+        backdrop-blur-sm
+        border
+        bottom-0
+        duration-300
+        ease-in-out
+        font-mono
+        left-1/2
+        p-2
+        rounded
+        text-white
+        transition
+        z-30
+      "
+      init="init"
+      @update-seed="updateFromStore()"
+      :class="{
+        'translate-y-full': !$store.seed.isOpen,
+      }"
+    >
+      <div class="flex overflow-x-auto" id="seedConfig">
+        <!-- Dynamically generated -->
+      </div>
+      <input class="w-full" type="range" min="0" :max="Number.MAX_SAFE_INTEGER" step="1" x-model="numericSeed" @input="updateFromNumericSeed($event.target.value)">
+      <div class="justify-between">
+        <button :disabled="!isMnemonicValid" @click="updateFromMnemonic()" class="bg-blue-700 text-white py-1 px-2 rounded disabled:opacity-50 disabled:cursor-not-allowed">Apply Mnemonic</button>
+        <input class="bg-transparent" id="mnemonic" type="text" x-model="mnemonic" x-bind:style="{ 'width': `${mnemonic.length + 1}ch` }" @input="checkMnemonic()">
+        <button @click="saveAndClose()" class="bg-blue-500 text-white py-1 px-2 rounded fixed right-2">Save</button>
+      </div>
+    </div>
+    <div
+      :class="{
+        'opacity-0': !isActive,
+        'opacity-100': isActive,
+        'translate-y-full bottom-0': !initAnimationStarted,
+        'bottom-0': initAnimationStarted,
+      }"
+      class="
+        absolute left-0 z-10
+        p-3
+        transition duration-200 ease-in slide-in
+      "
+    >
+      <div
+        @click="$store.seed.isOpen = !$store.seed.isOpen"
+        x-data="{ innerWidth: window.innerWidth }"
+        x-init="() => {
+          window.addEventListener('resize', () => {
+            innerWidth = window.innerWidth;
+          });
+        }"
+        x-show="innerWidth > 860"
+        class="
+          w-4 h-4
+          opacity-80 hover:opacity-100
+          cursor-pointer eject-icon
+        "
+      ></div>
+    </div>
+
+    <div
+      :class="{
+        'translate-y-28': !initAnimationStarted,
+      }"
+      class="
+        fixed bottom-0 left-1/2 z-10
+        -translate-x-1/2 mb-20
+        transition duration-200 ease-in
+        slide-in
+      "
+      x-data="ghostImageComponent()"
+      @pause-changed.window="triggerGhostImage()"
+    >
+    <!-- Floating Video Player Overlay -->
+      <div class="flex flex-col items-center justify-center p-0 bg-transparent">
+        <!-- Video Controls -->
+        <div class="flex items-center space-x-20 text-white">
+          <!-- Ghost Image Animation -->
+          <div
+            x-show="showGhostImage"
+            x-transition:leave="transition duration-500 ease-in-out opacity-0 scale-[2.5]"
+            :class="{
+              'play-icon': $store.canvas.isPaused,
+              'pause-icon': !$store.canvas.isPaused,
+            }"
+            class="cursor-pointer w-8 h-8"
+          >
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      :class="{
+        'translate-y-28': !initAnimationStarted,
+        'opacity-0': !isActive || $store.seed.isOpen,
+        'opacity-100': isActive && !$store.seed.isOpen,
+      }"
+      class="
+        fixed bottom-0 left-1/2 z-10
+        -translate-x-1/2 mb-20
+        transition duration-200 ease-in
+        slide-in
+      "
+    >
+      <!-- Floating Video Player Overlay -->
+      <div class="flex flex-col items-center justify-center p-0 bg-transparent">
+        <!-- Video Controls -->
+        <div class="flex items-center space-x-20 text-white">
+          <div @click="$store.mnemonics.previousMnemonic()" class="previous-icon opacity-80 hover:opacity-100 cursor-pointer w-8 h-8"></div>
+            <div @click="$store.canvas.togglePause()"
+              :class="{
+                'play-icon': $store.canvas.isPaused,
+                'pause-icon': !$store.canvas.isPaused,
+              }"
+              class="opacity-80 hover:opacity-100 cursor-pointer w-8 h-8"
+            ></div>
+          <div @click="$store.mnemonics.nextMnemonic()" class="next-icon opacity-80 hover:opacity-100 cursor-pointer w-8 h-8"></div>
+        </div>
+      </div>
+    </div>
+    <div
+      :class="{
+        'translate-y-full': !initAnimationStarted,
+        'opacity-0': !isActive || $store.seed.isOpen,
+        'opacity-100': isActive && !$store.seed.isOpen,
+      }"
+      class="
+        slide-in
+        transition
+        duration-200
+        ease-in
+        absolute
+        -translate-x-1/2
+        left-1/2
+        z-10
+        bottom-0
+      "
+    >
+      <div>
+        <div x-data="{ speeds: $store.canvas.speeds }" class="flex flex-col items-center mt-7">
+          <!-- Slider -->
+          <input
+          class="
+            w-full
+            h-1
+            bg-transparent backdrop-blur-sm
+            border border-zinc-500/50
+            rounded-full
+            appearance-none
+            cursor-pointer
+            slider-thumb
+          "
+            id="speedSlider"
+            :max="speeds.length - 1"
+            :value="speeds.indexOf($store.canvas.autoAdvanceSpeed)"
+            min="0"
+            step="1"
+            type="range"
+            @input="$store.canvas.setAutoAdvanceSpeed(speeds[$event.target.valueAsNumber]); $store.canvas.isAutoAdvanceMode = true"
+          />
+
+          <!-- Icons -->
+          <div class="flex justify-between w-full my-3">
+            <template x-for="(speed, index) in speeds" :key="index">
+              <div class="w-5 h-5" :class="'speed-' + speed + '-icon ' + ($store.canvas.autoAdvanceSpeed === speed && $store.canvas.isAutoAdvanceMode ? 'opacity-100': 'opacity-50')"></div>
+            </template>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      x-data="{ zoom: $store.canvas.zoom, zoomActive: false }"
+      @zoom-changed.window="zoom = $store.canvas.zoom; zoomActive = true; setTimeout(() => { zoomActive = false }, 2000)"
+      :class="{
+        'opacity-0': !isActive && !zoomActive,
+        'opacity-100': isActive || zoomActive,
+        'translate-x-full': !initAnimationStarted,
+        'translate-x-1/2': initAnimationStarted,
+      }"
+      class="
+        absolute top-1/2 right-0
+        m-3
+        rotate-90
+        transition-all duration-200 ease-in slide-in
+      "
+      style="
+        width: 50vh; /* Component is 90deg rotated so we base the width on the height */
+      "
+    >
+      <input
+        @input="$store.canvas.setZoom(zoom)"
+        class="
+          w-full h-1
+          bg-transparent backdrop-blur-sm
+          border border-zinc-500/50
+          rounded-full
+          appearance-none
+          cursor-pointer
+          slider-thumb
+        "
+        max="1"
+        min="0.01"
+        step="0.01"
+        type="range"
+        x-model="zoom"
+      >
+    </div>
+
+    <div
+      :class="{
+        'opacity-0': !isActive,
+        'opacity-100': isActive,
+        'translate-x-full right-0': !initAnimationStarted,
+        'right-0': initAnimationStarted,
+      }"
+      class="
+        absolute bottom-0 z-10
+        p-3
+        grid justify-items-end
+        transition duration-200 ease-in slide-in
+      "
+      x-data="shareButtonComponent()"
+    >
+      <!-- Copied URL Notification -->
+      <div
+        x-show="copied"
+        x-transition:enter="transition ease-out duration-300"
+        x-transition:enter-start="opacity-0 transform scale-90"
+        x-transition:leave="transition ease-in duration-300"
+        x-transition:leave-start="opacity-100"
+        x-transition:leave-end="opacity-0"
+        class="
+          relative
+          bg-black text-zinc-500
+          rounded
+          p-2
+          mt-4
+        "
+      >
+        Copied!
+      </div>
+
+      <!-- Share Icon -->
+      <div
+        @click="copyURL()"
+        class="
+          w-4 h-4
+          opacity-80 hover:opacity-100
+          cursor-pointer share-icon
+        "
+      ></div>
+    </div>
+
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
