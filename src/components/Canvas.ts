@@ -9,7 +9,7 @@ import {
   setPrecisionMode,
   PHYSICAL_MAX_TRACES_PER_FRAME,
 } from "../ParticleEngine";
-import { clamp, isDevMode } from "../Utilities";
+import { clamp, isDevMode, isTestMode } from "../Utilities";
 import { MnemonicsStore } from "./Mnemonics";
 import { SeedStore } from "./Seed";
 
@@ -131,6 +131,10 @@ enum PauseEndReason {
   TAB_UNHIDDEN = "TAB_UNHIDDEN",
 }
 
+let animationFrameId: number | null = null;
+export type AnimatedWindow = Window & typeof globalThis & { stopAnimation: boolean };
+(window as AnimatedWindow).stopAnimation = false;
+
 export function canvasComponent(this: CanvasComponent) {
   const canvas = this.$refs.canvas as HTMLCanvasElement;
 
@@ -140,12 +144,15 @@ export function canvasComponent(this: CanvasComponent) {
     animate() {
       const canvasStore = Alpine.store("canvas") as CanvasStore;
 
-      if (canvasStore.isPaused) {
+      if (canvasStore.isPaused || (window as AnimatedWindow).stopAnimation) {
+        if (animationFrameId) {
+          cancelAnimationFrame(animationFrameId);
+        }
         this.currentFpsSecond = null;
         canvasStore.currentFpsStatus = FpsStatus.NOT_COUNTING;
         return;
       }
-      requestAnimationFrame(() => this.animate());
+      animationFrameId = requestAnimationFrame(() => this.animate());
 
       this.lastFrameTime = performance.now();
 
@@ -281,7 +288,9 @@ export function canvasComponent(this: CanvasComponent) {
     resizeCanvas() {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
-      canvasStore.requestReset(true);
+      if (!isTestMode()) {
+        canvasStore.requestReset(true);
+      }
     },
 
     init() {

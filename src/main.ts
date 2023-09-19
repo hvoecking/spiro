@@ -6,6 +6,7 @@ import { seedComponent } from "./components/Seed";
 import { mnemonicsComponent } from "./components/Mnemonics";
 import fpsDisplay from "../html/fps-display.html?raw";
 import { isDevMode } from "./Utilities";
+import { shareButtonComponent } from "./components/ShareButton/ShareButton";
 
 type AlpineWindow = Window & typeof globalThis & { Alpine: typeof Alpine };
 
@@ -90,26 +91,6 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-interface ShareButtonComponent {
-  isOpen: boolean;
-  copied: boolean;
-  copyURL(): void;
-  init(): void;
-}
-
-export function shareButtonComponent(this: ShareButtonComponent) {
-  return {
-    isOpen: false,
-    copied: false,
-    copyURL: async () => {
-      // FIXME: Seems not to be workingf for mobile
-      await navigator.clipboard.writeText(window.location.href);
-      this.copied = true;
-      setTimeout(() => this.copied = false, 3000);
-    },
-  };
-}
-
 function ghostImageComponent() {
   return {
     showGhostImage: false,
@@ -127,6 +108,7 @@ Alpine.data("globalSettings", globalSettings);
 Alpine.data("initAlpine", initAlpine);
 Alpine.data("mnemonicsComponent", mnemonicsComponent);
 Alpine.data("seedComponent", seedComponent);
+Alpine.data("shareButtonComponent", shareButtonComponent);
 export interface SideMenuStore {
   isOpen: boolean;
   toggle(): void;
@@ -141,7 +123,6 @@ Alpine.store("sideMenu", {
 Alpine.store("about", {
   isOpen: false,
 });
-Alpine.data("shareButtonComponent", shareButtonComponent);
 Alpine.start();
 
 function importHtml(name: string, content: string) {
