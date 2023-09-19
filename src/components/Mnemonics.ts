@@ -58,8 +58,9 @@ export const mnemonicsStore: MnemonicsStore = {
 
   storeToLocationHash(): string {
     const encoded = encodeURIComponent(this.mnemonics[this.currentIdx]);
-    window.location.hash = `mnemonic=${encoded.replace(/%20/g, "+")}`;
-    return window.location.hash.substring(1);
+    const hash = `mnemonic=${encoded.replace(/%20/g, "+")}`;
+    window.location.hash = hash;
+    return hash;
   },
 
   loadFromLocationHash(): boolean {

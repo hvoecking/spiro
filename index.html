@@ -11,34 +11,39 @@
       }
     </style>
   </head>
-  <body x-cloak x-data="initAlpine()" x-init="init" class="overflow-hidden" :class="{
+  <body
+    :class="{
       'cursor-none': !isActive && $store.canvas.isFullScreen(),
-    }">
+    }"
+    x-cloak
+    x-data="initAlpine()"
+    class="overflow-hidden"
+  >
     <div
+      x-show="!initAnimationTriggered"
+      x-transition:leave="transition-all ease-in duration-700 transform"
+      x-transition:leave-start="opacity-100 scale-100 tracking-wider"
+      x-transition:leave-end="opacity-0 scale-150"
+      x-ref="initAnimation"
       class="
         absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50
         font-sans font-thin text-6xl tracking-wider
         text-white
         transform
       "
-      x-show="!initAnimationTriggered"
-      x-transition:leave-end="opacity-0 scale-150"
-      x-transition:leave-start="opacity-100 scale-100 tracking-wider"
-      x-transition:leave="transition-all ease-in duration-700 transform"
-      x-ref="initAnimation"
     >
       SPIRO
     </div>
     <canvas
       @click="$dispatch('escape')"
-      class="
-        absolute left-0 top-0 z-0
-        w-full h-full
-        m-0 p-0
-      "
-      style="background-color: #000; /* Needed for reading color from style in code */"
       x-data="canvasComponent()"
       x-ref="canvas"
+      class="
+        absolute w-full h-full left-0 top-0 z-0
+        m-0 p-0
+      "
+      style="background-color: #000; /* Needed to get color from style in code */"
+      data-test-id="canvas"
     ></canvas>
 
     <div id="fps-display"></div>
@@ -50,27 +55,37 @@
       }"
       @escape.window="$store.sideMenu.isOpen = false"
       class="
-        absolute
-        bg-gray-800
-        duration-300
-        ease-in-out
-        h-full
-        left-0
-        origin-left
-        overflow-visible
+        /* Layout and Box Model */
+        absolute h-full w-64 top-0 left-0 z-20 overflow-visible
+
+        /* Display & Typography */
         text-sm
-        top-0
-        transition-transform
-        w-64
-        z-20
+
+        /* Visuals */
+        bg-gray-800
+
+        /* Transitions and Animations */
+        duration-300 ease-in-out transition-transform origin-left
       "
       id="side-menu"
+      data-test-id="side-menu"
     >
-
-
       <div
         @click="$store.sideMenu.isOpen = !$store.sideMenu.isOpen"
-        class="flex items-center justify-between p-2 bg-gray-800 text-white hover:bg-gray-600 cursor-pointer"
+        class="
+          /* Layout and Box Model */
+          flex p-2
+
+          /* Flexbox & Grid */
+          items-center justify-between
+
+          /* Visuals */
+          bg-gray-800 text-white hover:bg-gray-600
+
+          /* Interactivity */
+          cursor-pointer
+        "
+        data-test-id="settings"
       >
         <p>Settings</p>
         <span
@@ -343,6 +358,7 @@
         p-2
         bg-transparent
       "
+      data-test-id="about"
     >
       <div class="bg-black bg-opacity-50 rounded-lg p-4 w-96 h-64 text-white">
         <h4 class="text-2xl font-semibold mb-4">About Spiro</h4>
@@ -394,12 +410,13 @@
     >
       <div
         @click="$store.about.open = !$store.about.open"
-        x-show="!$store.canvas.isFpsShown"
+        x-show="!$store.canvas.isFpsShown && !$store.about.open"
         class="
           w-4 h-4
           opacity-80 hover:opacity-100
           cursor-pointer info-icon
         "
+        data-test-id="info"
       ></div>
     </div>
 
@@ -428,6 +445,7 @@
       :class="{
         'translate-y-full': !$store.seed.isOpen,
       }"
+      data-test-id="seed"
     >
       <div class="flex overflow-x-auto" id="seedConfig">
         <!-- Dynamically generated -->
@@ -466,6 +484,7 @@
           opacity-80 hover:opacity-100
           cursor-pointer eject-icon
         "
+        data-test-id="eject"
       ></div>
     </div>
 
@@ -533,7 +552,6 @@
       :class="{
         'translate-y-full': !initAnimationStarted,
         'opacity-0': !isActive || $store.seed.isOpen,
-        'opacity-100': isActive && !$store.seed.isOpen,
       }"
       class="
         slide-in
@@ -585,7 +603,6 @@
       @zoom-changed.window="zoom = $store.canvas.zoom; zoomActive = true; setTimeout(() => { zoomActive = false }, 2000)"
       :class="{
         'opacity-0': !isActive && !zoomActive,
-        'opacity-100': isActive || zoomActive,
         'translate-x-full': !initAnimationStarted,
         'translate-x-1/2': initAnimationStarted,
       }"
@@ -621,46 +638,15 @@
     <div
       :class="{
         'opacity-0': !isActive,
-        'opacity-100': isActive,
-        'translate-x-full right-0': !initAnimationStarted,
-        'right-0': initAnimationStarted,
+        'translate-x-full': !initAnimationStarted,
       }"
       class="
-        absolute bottom-0 z-10
-        p-3
-        grid justify-items-end
+        spiro-share-button
+        absolute bottom-0 right-0 z-10
         transition duration-200 ease-in slide-in
       "
-      x-data="shareButtonComponent()"
+      data-test-id-prefix="primary-share-button"
     >
-      <!-- Copied URL Notification -->
-      <div
-        x-show="copied"
-        x-transition:enter="transition ease-out duration-300"
-        x-transition:enter-start="opacity-0 transform scale-90"
-        x-transition:leave="transition ease-in duration-300"
-        x-transition:leave-start="opacity-100"
-        x-transition:leave-end="opacity-0"
-        class="
-          relative
-          bg-black text-zinc-500
-          rounded
-          p-2
-          mt-4
-        "
-      >
-        Copied!
-      </div>
-
-      <!-- Share Icon -->
-      <div
-        @click="copyURL()"
-        class="
-          w-4 h-4
-          opacity-80 hover:opacity-100
-          cursor-pointer share-icon
-        "
-      ></div>
     </div>
 
     <script type="module" src="/src/main.ts"></script>

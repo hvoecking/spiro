@@ -7,12 +7,16 @@
     "vite-plugin-watch-and-run": "^1.1.3"
   },
   "devDependencies": {
+    "@cypress/vite-dev-server": "^5.0.6",
     "@types/alpinejs": "^3.7.2",
     "@types/tailwindcss": "^3.1.0",
     "@typescript-eslint/eslint-plugin": "^6.6.0",
     "@typescript-eslint/parser": "^6.6.0",
     "autoprefixer": "^10.4.15",
     "bip39": "^3.1.0",
+    "cypress": "^13.2.0",
+    "cypress-real-events": "^1.10.3",
+    "cypress-vite": "^1.4.2",
     "cz-conventional-changelog": "^3.3.0",
     "eslint": "^8.49.0",
     "husky": "^8.0.3",
@@ -29,7 +33,8 @@
     "cm": "cz",
     "dev": "npm run asbuild && vite",
     "lint": "eslint 'src/**/*.{js,ts}'",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test:e2e": "cypress open"
   },
   "private": true,
   "husky": {

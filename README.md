@@ -98,3 +98,51 @@ This project is licensed under the MIT License.
 ## Author
 
 For any questions or feedback, please contact [heye@hvo.io](mailto:heye@hvo.io).
+
+# Contribution Notes
+## HTML/Tailwind CSS
+### Recommended Order for Tailwind CSS Classes
+
+1. **Layout and Box Model**
+    - `container`, `box`, `block`, `hidden`
+    - Reasoning: These classes lay the foundation for the element's structure.
+
+2. **Positioning**
+    - `relative`, `absolute`, `fixed`
+    - Reasoning: They set the element's position in relation to its parent or the viewport.
+
+3. **Display**
+    - `flex`, `grid`, `inline`, `inline-block`
+    - Reasoning: These classes determine how the element should be displayed, often impacting its children.
+
+4. **Flexbox and Grid Layout**
+    - `justify-`, `items-`, `gap-`, `grid-cols-`
+    - Reasoning: These are specific to flexbox and grid layouts, dictating how children should be organized.
+
+5. **Spacing**
+    - `p-`, `px-`, `py-`, `m-`, `mx-`, `my-`
+    - Reasoning: These classes influence the spacing around the element, a key aspect of layout.
+
+6. **Dimensions**
+    - `w-`, `h-`, `min-h-`, `max-w-`
+    - Reasoning: Directly responsible for the size of the element.
+
+7. **Typography**
+    - `font-`, `text-`, `leading-`, `tracking-`
+    - Reasoning: These classes set the text properties, which are often specific to content within the element.
+
+8. **Visuals**
+    - `bg-`, `rounded-`, `shadow-`
+    - Reasoning: These classes are mainly cosmetic but can affect the element's visibility and focus.
+
+9. **Interactivity**
+    - `cursor-`, `hover:`, `focus:`, `active:`
+    - Reasoning: These classes affect how the element interacts with user input.
+
+10. **SVG and Media**
+    - `fill-`, `stroke-`
+    - Reasoning: These are specific to SVG and media elements, often not applicable to standard HTML elements.
+
+11. **Accessibility**
+    - `sr-only`, `not-sr-only`
+    - Reasoning: These classes are important for accessibility but don't impact the visual layout.
