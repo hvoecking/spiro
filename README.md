@@ -64,6 +64,11 @@ I wanted to build a visualization while I play music on my TV to avoid burn-in
     npm install
     ```
 
+3. Install global npm dependencies
+    ```bash
+    npm i -g asc
+    ```
+
 3. Install external dependencies
   * In order to convert small icons to base64 strings and embed them as style sheets the [`convert`](https://imagemagick.org/script/convert.php) command from [ImageMagic](https://imagemagick.org/script/download.php) must be available as a shell command.
 
