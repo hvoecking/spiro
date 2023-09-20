@@ -6,7 +6,8 @@ import { seedComponent } from "./components/Seed";
 import { mnemonicsComponent } from "./components/Mnemonics";
 import fpsDisplay from "../html/fps-display.html?raw";
 import { isDevMode } from "./Utilities";
-import { shareButtonComponent } from "./components/ShareButton/ShareButton";
+import { shareButton } from "./components/ShareButton/ShareButton";
+import { registerXComponents } from "./components/XComponent";
 
 type AlpineWindow = Window & typeof globalThis & { Alpine: typeof Alpine };
 
@@ -108,7 +109,8 @@ Alpine.data("globalSettings", globalSettings);
 Alpine.data("initAlpine", initAlpine);
 Alpine.data("mnemonicsComponent", mnemonicsComponent);
 Alpine.data("seedComponent", seedComponent);
-Alpine.data("shareButtonComponent", shareButtonComponent);
+Alpine.data("shareButtonComponent", shareButton.component);
+
 export interface SideMenuStore {
   isOpen: boolean;
   toggle(): void;
@@ -257,3 +259,7 @@ export function initAlpine(this: InitAlpineComponent): InitAlpineComponent {
     },
   } as InitAlpineComponent;
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+  registerXComponents();
+});

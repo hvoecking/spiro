@@ -1,10 +1,18 @@
 import Alpine from "alpinejs";
-import { shareButtonComponent } from "./../../src/components/ShareButton/ShareButton";
+import "cypress-real-events";
 
-Alpine.data("shareButton", shareButtonComponent);
+import { shareButton } from "./../../src/components/ShareButton/ShareButton";
 
-describe("ShareButton.cy.ts", () => {
-  it("playground", () => {
-    console.log(cy.mount("<div class='spiro-share-button'></div>"));
-  });
+Alpine.data("shareButtonComponent", shareButton.component);
+
+it("should copy with popup on share", () => {
+  cy.mount("<x-share-button data-test-id='share-button'></x-share-button>");
+
+  cy.get("[data-test-id='share-button-popup']").should("not.be.visible");
+
+  // When I click on the share button
+  cy.get("[data-test-id='share-button-icon']").realClick();
+
+  // Then the share popup should be visible
+  cy.get("[data-test-id='share-button-popup']").should("be.visible");
 });

@@ -1,33 +1,38 @@
-<div x-data="shareButtonComponent()" class="p-3 grid justify-items-end">
-  <!-- Copied URL Notification -->
+<template x-component="share-button">
   <div
-    x-show="copied"
-    x-transition:enter="transition ease-out duration-300"
-    x-transition:enter-start="opacity-0 transform scale-90"
-    x-transition:leave="transition ease-in duration-300"
-    x-transition:leave-start="opacity-100"
-    x-transition:leave-end="opacity-0"
-    class="
-      relative
-      bg-black text-zinc-500
-      rounded
-      p-2
-      mt-4
-    "
-    data-test-id-suffix="popup"
+    x-data="{ ...shareButtonComponent(), ...$el.parentElement.data() }"
+    class="p-3 grid justify-items-end"
   >
-    Copied!
-  </div>
+    <!-- Copied URL Notification -->
+    <div
+      x-show="copied"
+      x-transition:enter="transition ease-out duration-300"
+      x-transition:enter-start="opacity-0 transform scale-90"
+      x-transition:leave="transition ease-in duration-300"
+      x-transition:leave-start="opacity-100"
+      x-transition:leave-end="opacity-0"
+      class="
+        relative
+        bg-black text-zinc-500
+        rounded
+        p-2
+        mt-4
+      "
+      x-bind:data-test-id="get('data-test-id') + '-popup'"
+    >
+      Copied!
+    </div>
 
-  <!-- Share Icon -->
-  <div
-    @click="copyURL()"
-    class="
-      w-4 h-4
-      opacity-80 hover:opacity-100
-      cursor-pointer share-icon
-      text-white
-    "
-    data-test-id-suffix="icon"
-  ></div>
-</div>
+    <!-- Share Icon -->
+    <div
+      @click="copyURL()"
+      class="
+        w-4 h-4
+        opacity-80 hover:opacity-100
+        cursor-pointer share-icon
+        text-white
+      "
+      x-bind:data-test-id="get('data-test-id') + '-icon'"
+    ></div>
+  </div>
+</template>

@@ -635,19 +635,18 @@
       >
     </div>
 
-    <div
+    <x-share-button
       :class="{
         'opacity-0': !isActive,
         'translate-x-full': !initAnimationStarted,
       }"
       class="
-        spiro-share-button
         absolute bottom-0 right-0 z-10
         transition duration-200 ease-in slide-in
       "
-      data-test-id-prefix="primary-share-button"
+      data-test-id="primary-share-button"
     >
-    </div>
+    </x-share-button>
 
     <script type="module" src="/src/main.ts"></script>
   </body>
