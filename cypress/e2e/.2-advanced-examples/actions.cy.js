@@ -25,13 +25,6 @@ context("Actions", () => {
     });
   });
 
-  afterEach(() => {
-    cy.window().then((win) => {
-      win.stopAnimation = true;
-    });
-    cy.get("body").invoke("remove");
-  });
-
   // // https://on.cypress.io/interacting-with-elements
 
   // xit(".type() - type into a DOM element", () => {
@@ -91,9 +84,19 @@ context("Actions", () => {
   //     .next().should("contain", "Your form has been submitted!")
   // })
 
+  it("should pause on toggle switch to auto advance off", () => {
+    // Given the auto advance mode is on
+    cy.get(".pause-icon").should("be.visible");
+    cy.get("[data-test-id='speed-fast-icon']").should("be.visible").click();
+
+    // When I click on the auto advance toggle
+    cy.get("[data-test-id='autoAvanceModeToggle']").realClick({ force: true });
+
+    cy.get(".play-icon").should("be.visible");
+  });
+
   it("should copy with popup on share", () => {
     // Given the simulation is running
-    cy.get(".spiro-share-button").should("be.visible");
     cy.get("[data-test-id='primary-share-button-icon']").should("be.visible");
     cy.get("[data-test-id='primary-share-button-popup']").should("not.be.visible");
 

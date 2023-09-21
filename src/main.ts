@@ -5,92 +5,15 @@ import { CanvasStore, canvasComponent } from "./components/Canvas";
 import { seedComponent } from "./components/Seed";
 import { mnemonicsComponent } from "./components/Mnemonics";
 import fpsDisplay from "../html/fps-display.html?raw";
-import { isDevMode } from "./Utilities";
+import { isDevMode, isTestMode } from "./Utilities";
 import { shareButton } from "./components/ShareButton/ShareButton";
-import { registerXComponents } from "./components/XComponent";
+import { toggle } from "./components/Toggle/Toggle";
+import { getXComponents, registerXComponent } from "./components/XComponent";
 
 type AlpineWindow = Window & typeof globalThis & { Alpine: typeof Alpine };
 
 (window as AlpineWindow).Alpine = Alpine;
 
-function generateToggle(
-  breakout: boolean,
-  func: string,
-  hint = "",
-  iconLeft = "",
-  iconRight = "",
-  id: string,
-  label: string,
-  model: string,
-  textLeft = "",
-  textRight = "",
-) {
-  return `
-  <div class="p-2 text-white bg-gray-700 flex items-center justify-between">
-    <div>
-      <p>${label}</p>
-      <p class="text-zinc-400 text-[11px]" x-text="${hint}"></p>
-    </div>
-    <div :class="{ 'opacity-0': !isActive && !$store.sideMenu.isOpen, 'opacity-80 hover:opacity-100': isActive && !$store.sideMenu.isOpen, '-left-full slide-in': ${breakout} }" class="transition-all duration-200 ease-in">
-      <div
-        :class="{
-          '-left-full': ${breakout} && !initAnimationStarted,
-          'translate-x-[4.25rem]': ${breakout} && (!$store.sideMenu.isOpen && initAnimationStarted),
-          'relative': !${breakout} || ($store.sideMenu.isOpen && initAnimationStarted),
-          'slide-in': ${breakout},
-        }"
-        class="inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in overflow-visible"
-      >
-        <input type="checkbox" id="${id}" name="${id}" class="toggle-checkbox hidden" @click="${func}" x-model="${model}">
-        <label
-          :class="{
-            'bg-transparent border color-black': !$store.sideMenu.isOpen,
-            'bg-gray-600': $store.sideMenu.isOpen,
-          }"
-          for="${id}" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-600 cursor-pointer duration-200 ease-in transition-full">
-          <span class="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition" :class="{'translate-x-4': ${model}}">
-            <div
-              :class="{'${iconLeft}': !${model}, '${iconRight}': ${model}}"
-              class="text-black text-[11px] flex items-center justify-center w-2 h-2 m-1"
-              x-text="${model} ? '${textRight}' : '${textLeft}'"
-            ></div>
-          </span>
-        </label>
-      </div>
-    </div>
-  </div>
-  `;
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-  const toggleContainers = document.querySelectorAll(".toggle-container");
-
-  toggleContainers.forEach((container: Element) => {
-    const breakout = container.getAttribute("data-breakout") === "true";
-    const func = container.getAttribute("data-function") || "";
-    const hint = container.getAttribute("data-hint") || "";
-    const iconLeft = container.getAttribute("data-icon-left") || "";
-    const iconRight = container.getAttribute("data-icon-right") || "";
-    const id = container.getAttribute("data-id") || "";
-    const label = container.getAttribute("data-label") || "";
-    const model = container.getAttribute("data-model") || "";
-    const textLeft = container.getAttribute("data-text-left") || "";
-    const textRight = container.getAttribute("data-text-right") || "";
-
-    container.innerHTML = generateToggle(
-      breakout,
-      func,
-      hint,
-      iconLeft,
-      iconRight,
-      id,
-      label,
-      model,
-      textLeft,
-      textRight,
-    );
-  });
-});
 
 function ghostImageComponent() {
   return {
@@ -109,7 +32,8 @@ Alpine.data("globalSettings", globalSettings);
 Alpine.data("initAlpine", initAlpine);
 Alpine.data("mnemonicsComponent", mnemonicsComponent);
 Alpine.data("seedComponent", seedComponent);
-Alpine.data("shareButtonComponent", shareButton.component);
+Alpine.data("shareButtonComponent", shareButton.alpineComponent);
+Alpine.data("toggleComponent", toggle.alpineComponent);
 
 export interface SideMenuStore {
   isOpen: boolean;
@@ -180,7 +104,7 @@ export function globalSettings(this: GlobalSettings) {
       const wasActive = Date.now() - this.lastActivityTime < INACTIVITY_TIMEOUT;
       const isOpen = (Alpine.store("sideMenu") as SideMenuStore).isOpen;
       const isPaused = (Alpine.store("canvas") as CanvasStore).isPaused;
-      this.isActive = wasActive || isOpen || isPaused;
+      this.isActive = wasActive || isOpen || isPaused || isTestMode();
       if (this.isActive) {
         releaseWakeLock();
       } else {
@@ -197,7 +121,7 @@ export function globalSettings(this: GlobalSettings) {
 
     init() {
       // The init animation starts at 500ms and takes another 700ms to complete. The
-      // chevron animation takes 300ms. We want a delay that makes both to end at the
+      // slide-in animation takes 300ms. We want a delay that makes both to end at the
       // same time.
       const delay = 500 + 700 - 300;
       setTimeout(() => this.initAnimationStarted = true, delay);
@@ -227,7 +151,6 @@ export function globalSettings(this: GlobalSettings) {
 }
 
 interface InitAlpineComponent extends AlpineComponent<Record<string | symbol, unknown>> {
-  isFullScreen: boolean;
   initAnimationTriggered: boolean;
   $refs: {
     canvas: HTMLElement;
@@ -241,7 +164,6 @@ interface InitAlpineComponent extends AlpineComponent<Record<string | symbol, un
 
 export function initAlpine(this: InitAlpineComponent): InitAlpineComponent {
   return {
-    isFullScreen: false,
     initAnimationTriggered: false,
 
     init() {
@@ -261,5 +183,5 @@ export function initAlpine(this: InitAlpineComponent): InitAlpineComponent {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  registerXComponents();
+  getXComponents().forEach(c => registerXComponent(c));
 });

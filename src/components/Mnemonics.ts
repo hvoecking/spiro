@@ -1,7 +1,7 @@
 import Alpine from "alpinejs";
 
 import { Seed, SeedStore, mnemonicFromSeed, seedFromMnemonic } from "./Seed";
-import { clamp } from "../Utilities";
+import { clamp, isTestMode } from "../Utilities";
 
 export interface MnemonicsStore {
   mnemonics: string[];
@@ -59,7 +59,9 @@ export const mnemonicsStore: MnemonicsStore = {
   storeToLocationHash(): string {
     const encoded = encodeURIComponent(this.mnemonics[this.currentIdx]);
     const hash = `mnemonic=${encoded.replace(/%20/g, "+")}`;
-    window.location.hash = hash;
+    if (!isTestMode()) {
+      window.location.hash = hash;
+    }
     return hash;
   },
 
