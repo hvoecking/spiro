@@ -44,7 +44,7 @@ export const seedStore: SeedStore = {
   seed: [] as Seed,
   setSeed(seed: Seed, immediateFeedback: boolean) {
     this.seed = seed;
-    afterInit(() => seedModel.$dispatch("update-seed"));
+    afterInit(() => seedModel && seedModel.$dispatch("update-seed"));
     (Alpine.store("canvas") as CanvasStore).requestReset(immediateFeedback);
   },
 };

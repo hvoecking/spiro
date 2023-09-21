@@ -95,12 +95,12 @@
             'opacity-80 hover:opacity-100': isActive && !$store.sideMenu.isOpen,
             'relative': !($store.sideMenu.isOpen && initAnimationStarted),
             'translate-x-12': !$store.sideMenu.isOpen && initAnimationStarted,
-            'rotate-0': !$store.sideMenu.isOpen,
-            'rotate-180': $store.sideMenu.isOpen,
+            'translate-x-1 rotate-180': $store.sideMenu.isOpen,
           }"
           class="
             transition-transform
-            mr-4
+            pr-4
+            origin-left
             text-xl font-bold
             text-white
             select-none cursor-pointer
@@ -144,47 +144,51 @@
         </div>
       </div>
 
-      <div
-        id="darkModeContainer"
-        class="toggle-container"
-        data-breakout="true"
-        data-label="Dark Mode"
-        data-id="darkModeToggle"
-        data-function="toggleDarkMode()"
-        data-hint="'Switch to ' + (isDarkMode ? 'light' : 'dark') + ' mode'"
+      <x-toggle
+        :data-hint="'Switch to ' + (isDarkMode ? 'light' : 'dark') + ' mode'"
+        data-breakout
         data-icon-left="is-dark-mode-false-icon"
         data-icon-right="is-dark-mode-true-icon"
+        data-id="darkModeToggle"
+        data-label="Dark Mode"
         data-model="isDarkMode"
+        x-data="{
+          click: () => toggleDarkMode(),
+          model: isDarkMode,
+        }"
       >
-      </div>
+      </x-toggle>
 
-      <div
-        id="shapesModeContainer"
-        class="toggle-container"
-        data-breakout="true"
-        data-label="Spiro Type"
-        data-id="shapesModeToggle"
-        data-function="$store.canvas.toggleShapesMode()"
-        data-hint="'Switch to ' + ($store.canvas.isShapesMode ? 'shapes' : 'circles') + ' mode'"
+      <x-toggle
+        :data-hint="'Switch to ' + ($store.canvas.isShapesMode ? 'shapes' : 'circles') + ' mode'"
+        data-breakout
         data-icon-left="is-shape-mode-false-icon"
         data-icon-right="is-shape-mode-true-icon"
+        data-id="shapesModeToggle"
+        data-label="Spiro Type"
         data-model="$store.canvas.isShapesMode"
+        x-data="{
+          click: () => $store.canvas.toggleShapesMode(),
+          model: $store.canvas.isShapesMode,
+        }"
       >
-      </div>
+      </x-toggle>
 
-      <div
-        class="toggle-container"
-        data-breakout="true"
-        data-function="$store.canvas.toggleAutoAdvanceMode()"
-        data-hint="'Switch to ' + ($store.canvas.isAutoAdvanceMode ? 'Single Seed' : 'Auto-Advance') + ' mode'"
+      <x-toggle
+        :data-hint="'Switch to ' + (model ? 'Single Seed' : 'Auto-Advance') + ' mode'"
+        data-breakout
         data-id="autoAvanceModeToggle"
         data-label="Progression"
         data-model="$store.canvas.isAutoAdvanceMode"
+        data-test-id="auto-advance"
         data-text-left="1"
         data-text-right="∞"
-        id="autoAvanceModeContainer"
+        x-data="{
+          click: () => $store.canvas.toggleAutoAdvanceMode(),
+          model: $store.canvas.isAutoAdvanceMode,
+        }"
       >
-      </div>
+      </x-toggle>
 
       <div
         @click="$store.sideMenu.isAdvancedMenuOpen = !$store.sideMenu.isAdvancedMenuOpen"
@@ -219,26 +223,28 @@
         x-transition:leave-start="opacity-100 transform translate-y-0"
         x-transition:leave-end="opacity-0 transform -translate-y-2"
       >
-        <div
-          id="fpsModeContainer"
-          class="toggle-container"
-          data-label="Frames per Second"
+        <x-toggle
+          :data-hint="'Click to ' + ($store.canvas.isFpsShown ? 'hide' : 'show') + ' FPS'"
           data-id="fpsModeToggle"
-          data-function="$store.canvas.isFpsShown = !$store.canvas.isFpsShown"
-          data-hint="'Click to ' + ($store.canvas.isFpsShown ? 'hide' : 'show') + ' FPS'"
+          data-label="Frames per Second"
           data-model="$store.canvas.isFpsShown"
+          x-data="{
+            click: () => $store.canvas.isFpsShown = !$store.canvas.isFpsShown,
+            model: $store.canvas.isFpsShown,
+          }"
         >
-        </div>
-        <div
-          id="precisionModeContainer"
-          class="toggle-container"
-          data-label="Precision"
+        </x-toggle>
+        <x-toggle
+          :data-hint="'Switch to ' + ($store.canvas.isHighPrecisionMode ? 'Float32' : 'Float64') + ' mode'"
           data-id="precisionModeToggle"
-          data-function="$store.canvas.togglePrecisionMode()"
-          data-hint="'Switch to ' + ($store.canvas.isHighPrecisionMode ? 'Float32' : 'Float64') + ' mode'"
+          data-label="Precision"
           data-model="$store.canvas.isHighPrecisionMode"
+          x-data="{
+            click: () => $store.canvas.togglePrecisionMode(),
+            model: $store.canvas.isHighPrecisionMode,
+          }"
         >
-        </div>
+        </x-toggle>
 
         <div
           @click="$store.sideMenu.isExperimentalMenuOpen = !$store.sideMenu.isExperimentalMenuOpen"
@@ -273,27 +279,29 @@
           x-transition:leave-start="opacity-100 transform translate-y-0"
           x-transition:leave-end="opacity-0 transform -translate-y-2"
         >
-          <div
-            id="wasmModeContainer"
+          <x-toggle
+            :data-hint="'Switch to ' + ($store.canvas.isWasmMode ? 'JavaScript' : 'WebAssembly') + ' mode'"
             :disabled="!$store.canvas.isWasmModuleLoaded"
-            class="toggle-container"
-            data-function="$store.canvas.toggleWasmMode()"
-            data-hint="'Switch to ' + ($store.canvas.isWasmMode ? 'JavaScript' : 'WebAssembly') + ' mode'"
             data-id="wasmModeToggle"
             data-label="Execution"
             data-model="$store.canvas.isWasmMode"
+            x-data="{
+              click: () => $store.canvas.toggleWasmMode(),
+              model: $store.canvas.isWasmMode,
+            }"
           >
-          </div>
-          <div
-            id="velocityModeContainer"
-            class="toggle-container"
-            data-label="Velocity"
+          </x-toggle>
+          <x-toggle
+            :data-hint="'Switch to ' + ($store.canvas.isRenderVelocity ? 'not' : '') + ' rendering velocity'"
             data-id="velocityModeToggle"
-            data-function="$store.canvas.isRenderVelocity != $store.canvas.isRenderVelocity"
-            data-hint="'Switch to ' + ($store.canvas.isRenderVelocity ? 'not' : '') + ' rendering velocity'"
+            data-label="Velocity"
             data-model="$store.canvas.isRenderVelocity"
+            x-data="{
+              click: () => $store.canvas.isRenderVelocity = !$store.canvas.isRenderVelocity,
+              model: $store.canvas.isRenderVelocity,
+            }"
           >
-          </div>
+          </x-toggle>
           <!-- Rendering Smoothness Slider -->
           <div
             class="
@@ -365,17 +373,13 @@
 
         <p class="text-base mb-4">
           <strong>Spiro</strong> is a digital art tool that visualizes a particle's chaotic orbit around a black hole. Save, load, and share your patterns using a 128-bit, BIP39 mnemonic seed using the
-          <span
-            x-data="shareButtonComponent()"
-            @click="copyURL();"
+          <span><x-share-button
             class="
               fixed
-              w-3 h-3
-              mt-1
-              opacity-80 hover:opacity-100
-              cursor-pointer share-icon
             "
-          ></span>
+            data-id="about-share-button"
+          >
+          </x-share-button></span>
           &nbsp; &nbsp;
           button.
         </p>
@@ -493,7 +497,7 @@
         'translate-y-28': !initAnimationStarted,
       }"
       class="
-        fixed bottom-0 left-1/2 z-10
+        absolute bottom-0 left-1/2 z-10
         -translate-x-1/2 mb-20
         transition duration-200 ease-in
         slide-in
@@ -526,7 +530,7 @@
         'opacity-100': isActive && !$store.seed.isOpen,
       }"
       class="
-        fixed bottom-0 left-1/2 z-10
+        absolute bottom-0 left-1/2 z-10
         -translate-x-1/2 mb-20
         transition duration-200 ease-in
         slide-in
@@ -591,7 +595,12 @@
           <!-- Icons -->
           <div class="flex justify-between w-full my-3">
             <template x-for="(speed, index) in speeds" :key="index">
-              <div class="w-5 h-5" :class="'speed-' + speed + '-icon ' + ($store.canvas.autoAdvanceSpeed === speed && $store.canvas.isAutoAdvanceMode ? 'opacity-100': 'opacity-50')"></div>
+              <div
+                class="w-5 h-5 cursor-pointer"
+                :data-test-id="'speed-' + speed + '-icon'"
+                :class="'speed-' + speed + '-icon ' + ($store.canvas.autoAdvanceSpeed === speed && $store.canvas.isAutoAdvanceMode ? 'opacity-100': 'opacity-50')"
+                @click="$store.canvas.setAutoAdvanceSpeed(index); $store.canvas.isAutoAdvanceMode = true"
+              ></div>
             </template>
           </div>
         </div>
@@ -644,7 +653,7 @@
         absolute bottom-0 right-0 z-10
         transition duration-200 ease-in slide-in
       "
-      data-test-id="primary-share-button"
+      data-id="primary-share-button"
     >
     </x-share-button>
 

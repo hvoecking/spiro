@@ -1,6 +1,8 @@
 // Import Alpine.js if needed
 import Alpine from "alpinejs";
-import { registerXComponents } from "../../../src/components/XComponent";
+import { getXComponents, registerXComponent } from "../../../src/components/XComponent";
+
+window.Alpine = Alpine;
 
 // Define the mount function
 export const mount = (component, options = {}) => {
@@ -16,7 +18,7 @@ export const mount = (component, options = {}) => {
   // Initialize Alpine.js on the new element
   Alpine.start();
 
-  registerXComponents();
+  getXComponents().forEach(c => registerXComponent(c));
 
   // Return the mounted component for further testing
   return cy.wrap(div);

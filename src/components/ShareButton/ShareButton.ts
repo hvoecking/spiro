@@ -1,13 +1,12 @@
-import shareButtonHtml from "./ShareButton.html?raw";
-import { XAlpineComponent, createAndRegisterXComponent } from "../XComponent";
+import template from "./ShareButton.html?raw";
+import { XComponent, XAlpineComponent } from "../XComponent";
 
-interface ShareButtonComponent extends XAlpineComponent<ShareButtonComponent> {
+interface ShareButtonComponent extends XAlpineComponent {
   copied: boolean;
   copyURL(): void;
-  init(): void;
 }
 
-function shareButtonComponent(this: ShareButtonComponent) {
+export function shareButtonComponent(this: ShareButtonComponent) {
   return {
     copied: false,
     copyURL: async function() {
@@ -18,8 +17,4 @@ function shareButtonComponent(this: ShareButtonComponent) {
   };
 }
 
-export const shareButton = createAndRegisterXComponent<ShareButtonComponent>(
-  shareButtonComponent as unknown as (this: ShareButtonComponent) => ShareButtonComponent,
-  shareButtonHtml,
-  "share-button",
-);
+export const shareButton = new XComponent(template, "share-button", shareButtonComponent);

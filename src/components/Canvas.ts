@@ -40,7 +40,7 @@ const INITIAL_AUTO_ADVANCE_SPEED = AutoAdvanceSpeeds.MEDIUM;
 const AUTO_ADVANCE_DELAY = {
   [AutoAdvanceSpeeds.SLOW]: 16 * 1000,
   [AutoAdvanceSpeeds.MEDIUM]: 8 * 1000,
-  [AutoAdvanceSpeeds.FAST]: 4 * 1000,
+  [AutoAdvanceSpeeds.FAST]: (isTestMode() ? 0 : 4) * 1000,
 };
 
 const MAX_TRACES_PER_FRAME = {
@@ -351,6 +351,7 @@ export function canvasComponent(this: CanvasComponent) {
       this.minMultiplier = 1.05 * smoothness*(1+smoothness/10);
     },
     setAutoAdvanceSpeed(speed: AutoAdvanceSpeeds) {
+      if (!speed) return;
       this.autoAdvanceSpeed = speed;
       this.maxTracesPerFrame = MAX_TRACES_PER_FRAME[speed] * (this.renderingSmoothness > 1 ? this.renderingSmoothness * RENDERING_SMOOTHNESS_TRACES_FACTOR : 1);
       this.maxTotalTraces = MAX_TOTAL_TRACES_PER_FRAME[speed] * (this.renderingSmoothness > 1 ? this.renderingSmoothness * RENDERING_SMOOTHNESS_TRACES_FACTOR : 1);

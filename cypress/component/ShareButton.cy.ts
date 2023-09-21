@@ -3,10 +3,10 @@ import "cypress-real-events";
 
 import { shareButton } from "./../../src/components/ShareButton/ShareButton";
 
-Alpine.data("shareButtonComponent", shareButton.component);
+Alpine.data("shareButtonComponent", shareButton.alpineComponent);
 
 it("should copy with popup on share", () => {
-  cy.mount("<x-share-button data-test-id='share-button'></x-share-button>");
+  cy.mount("<x-share-button data-id='share-button'></x-share-button>");
 
   cy.get("[data-test-id='share-button-popup']").should("not.be.visible");
 
