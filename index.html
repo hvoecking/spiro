@@ -46,7 +46,7 @@
       data-test-id="canvas"
     ></canvas>
 
-    <div id="fps-display"></div>
+    <x-fps-display></x-fps-display>
 
     <div
       :class="{
@@ -144,7 +144,7 @@
         </div>
       </div>
 
-      <x-toggle
+      <x-toggle-switch
         :data-hint="'Switch to ' + (isDarkMode ? 'light' : 'dark') + ' mode'"
         data-breakout
         data-icon-left="is-dark-mode-false-icon"
@@ -157,9 +157,9 @@
           model: isDarkMode,
         }"
       >
-      </x-toggle>
+      </x-toggle-switch>
 
-      <x-toggle
+      <x-toggle-switch
         :data-hint="'Switch to ' + ($store.canvas.isShapesMode ? 'shapes' : 'circles') + ' mode'"
         data-breakout
         data-icon-left="is-shape-mode-false-icon"
@@ -172,9 +172,9 @@
           model: $store.canvas.isShapesMode,
         }"
       >
-      </x-toggle>
+      </x-toggle-switch>
 
-      <x-toggle
+      <x-toggle-switch
         :data-hint="'Switch to ' + (model ? 'Single Seed' : 'Auto-Advance') + ' mode'"
         data-breakout
         data-id="autoAvanceModeToggle"
@@ -188,7 +188,7 @@
           model: $store.canvas.isAutoAdvanceMode,
         }"
       >
-      </x-toggle>
+      </x-toggle-switch>
 
       <div
         @click="$store.sideMenu.isAdvancedMenuOpen = !$store.sideMenu.isAdvancedMenuOpen"
@@ -223,7 +223,7 @@
         x-transition:leave-start="opacity-100 transform translate-y-0"
         x-transition:leave-end="opacity-0 transform -translate-y-2"
       >
-        <x-toggle
+        <x-toggle-switch
           :data-hint="'Click to ' + ($store.canvas.isFpsShown ? 'hide' : 'show') + ' FPS'"
           data-id="fpsModeToggle"
           data-label="Frames per Second"
@@ -233,8 +233,8 @@
             model: $store.canvas.isFpsShown,
           }"
         >
-        </x-toggle>
-        <x-toggle
+        </x-toggle-switch>
+        <x-toggle-switch
           :data-hint="'Switch to ' + ($store.canvas.isHighPrecisionMode ? 'Float32' : 'Float64') + ' mode'"
           data-id="precisionModeToggle"
           data-label="Precision"
@@ -244,7 +244,7 @@
             model: $store.canvas.isHighPrecisionMode,
           }"
         >
-        </x-toggle>
+        </x-toggle-switch>
 
         <div
           @click="$store.sideMenu.isExperimentalMenuOpen = !$store.sideMenu.isExperimentalMenuOpen"
@@ -279,7 +279,7 @@
           x-transition:leave-start="opacity-100 transform translate-y-0"
           x-transition:leave-end="opacity-0 transform -translate-y-2"
         >
-          <x-toggle
+          <x-toggle-switch
             :data-hint="'Switch to ' + ($store.canvas.isWasmMode ? 'JavaScript' : 'WebAssembly') + ' mode'"
             :disabled="!$store.canvas.isWasmModuleLoaded"
             data-id="wasmModeToggle"
@@ -290,8 +290,8 @@
               model: $store.canvas.isWasmMode,
             }"
           >
-          </x-toggle>
-          <x-toggle
+          </x-toggle-switch>
+          <x-toggle-switch
             :data-hint="'Switch to ' + ($store.canvas.isRenderVelocity ? 'not' : '') + ' rendering velocity'"
             data-id="velocityModeToggle"
             data-label="Velocity"
@@ -301,7 +301,7 @@
               model: $store.canvas.isRenderVelocity,
             }"
           >
-          </x-toggle>
+          </x-toggle-switch>
           <!-- Rendering Smoothness Slider -->
           <div
             class="

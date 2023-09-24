@@ -4,10 +4,10 @@ import Alpine, { AlpineComponent } from "alpinejs";
 import { CanvasStore, canvasComponent } from "./components/Canvas";
 import { seedComponent } from "./components/Seed";
 import { mnemonicsComponent } from "./components/Mnemonics";
-import fpsDisplay from "../html/fps-display.html?raw";
 import { isDevMode, isTestMode } from "./Utilities";
 import { shareButton } from "./components/ShareButton/ShareButton";
-import { toggle } from "./components/Toggle/Toggle";
+import { fpsDisplay } from "./components/FpsDisplay/FpsDisplay";
+import { toggleSwitch } from "./components/ToggleSwitch/ToggleSwitch";
 import { getXComponents, registerXComponent } from "./components/XComponent";
 
 type AlpineWindow = Window & typeof globalThis & { Alpine: typeof Alpine };
@@ -32,8 +32,9 @@ Alpine.data("globalSettings", globalSettings);
 Alpine.data("initAlpine", initAlpine);
 Alpine.data("mnemonicsComponent", mnemonicsComponent);
 Alpine.data("seedComponent", seedComponent);
+Alpine.data("fpsDisplayComponent", fpsDisplay.alpineComponent);
 Alpine.data("shareButtonComponent", shareButton.alpineComponent);
-Alpine.data("toggleComponent", toggle.alpineComponent);
+Alpine.data("toggleSwitchComponent", toggleSwitch.alpineComponent);
 
 export interface SideMenuStore {
   isOpen: boolean;
@@ -50,14 +51,6 @@ Alpine.store("about", {
   isOpen: false,
 });
 Alpine.start();
-
-function importHtml(name: string, content: string) {
-  const element = document.getElementById(name);
-  if (!element) throw new Error(`Element with id ${name} not found`);
-  element.innerHTML = content;
-}
-
-importHtml("fps-display", fpsDisplay);
 
 interface GlobalSettings {
   isDarkMode: boolean;

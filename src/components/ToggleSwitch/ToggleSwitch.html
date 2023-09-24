@@ -2,9 +2,9 @@
 <!-- TODO: Remove all the magic of breakout, isActive, and initAnimation behavior -->
 <!-- TODO: Use proper event handling instead of (model ? '' : '') -->
 
-<template x-component="toggle">
+<template x-component="toggle-switch">
   <div
-    x-data="{ ...toggleComponent(), ...$el.parentElement.data() }"
+    x-data="{ ...toggleSwitchComponent(), ...$el.parentElement.data() }"
   >
     <div class="p-2 text-white bg-gray-700 flex items-center justify-between">
       <div>
