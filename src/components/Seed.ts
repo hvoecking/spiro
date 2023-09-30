@@ -32,14 +32,8 @@ interface SeedBaseModel extends AlpineComponent<Record<string | symbol, unknown>
 type SeedModel = { [x: string]: string | number | boolean } & SeedBaseModel;
 let seedModel: SeedModel;
 
-export interface SeedStore {
-  isOpen: boolean;
-  seed: Seed;
-  setSeed(seed: Seed, immediateFeedback: boolean): void;
-}
-
 const afterInit = Alpine.nextTick;
-export const seedStore: SeedStore = {
+const _seedStore = {
   isOpen: false,
   seed: [] as Seed,
   setSeed(seed: Seed, immediateFeedback: boolean) {
@@ -48,7 +42,9 @@ export const seedStore: SeedStore = {
     (Alpine.store("canvas") as CanvasStore).requestReset(immediateFeedback);
   },
 };
-Alpine.store("seed", seedStore);
+Alpine.store("seed", _seedStore);
+
+export const seedStore = Alpine.store("seed") as typeof _seedStore;
 
 function signedSeedPart(
   name: string,
@@ -237,7 +233,7 @@ export function seedComponent(this: SeedModel): SeedModel {
 
     fromSeedFunctions: [] as ((seedModel: SeedModel, seed: Seed) => void)[],
     updateFromStore() {
-      const seed = (Alpine.store("seed") as SeedStore).seed;
+      const seed = seedStore.seed;
       for (const f of this.fromSeedFunctions) {
         f(this as SeedModel, seed);
       }

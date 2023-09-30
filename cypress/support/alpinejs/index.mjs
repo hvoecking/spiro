@@ -1,11 +1,14 @@
+/* eslint-disable no-undef */
+/// <reference types="cypress" />
+
 // Import Alpine.js if needed
 import Alpine from "alpinejs";
 import { getXComponents, registerXComponent } from "../../../src/components/XComponent";
 
 window.Alpine = Alpine;
 
-// Define the mount function
-export const mount = (component, options = {}) => {
+// Define the mount function, add options = {} as second argument if needed
+export const mount = (component) => {
   // Create a div element to host the Alpine.js component
   const div = document.createElement("div");
 

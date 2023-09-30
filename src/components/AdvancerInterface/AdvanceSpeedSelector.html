@@ -1,0 +1,42 @@
+<template x-component="speed-selector">
+  <div
+    x-data="{ ...advanceSpeedSelectorComponent(), ...$el.parentElement.data() }"
+  >
+    <div>
+      <div x-data="{ speeds: $store.advancer.speeds }" class="flex flex-col items-center mt-7">
+        <!-- Slider -->
+        <input
+        class="
+          w-full
+          h-1
+          bg-transparent backdrop-blur-sm
+          border border-zinc-500/50
+          rounded-full
+          appearance-none
+          cursor-pointer
+          slider-thumb
+        "
+          id="speedSlider"
+          :max="speeds.length - 1"
+          :value="speeds.indexOf($store.advancer.autoAdvanceSpeed)"
+          min="0"
+          step="1"
+          type="range"
+          @input="advancer.setAutoAdvanceSpeed(speeds[$event.target.valueAsNumber], $store.canvas.renderingSmoothness); $store.canvas.isAutoAdvanceMode = true"
+        />
+
+        <!-- Icons -->
+        <div class="flex justify-between w-full my-3">
+          <template x-for="(speed, index) in speeds" :key="index">
+            <div
+              class="w-5 h-5 cursor-pointer"
+              :data-test-id="'speed-' + speed + '-icon'"
+              :class="'speed-' + speed + '-icon ' + ($store.advancer.autoAdvanceSpeed === speed && $store.canvas.isAutoAdvanceMode ? 'opacity-100': 'opacity-50')"
+              @click="advancer.setAutoAdvanceSpeed(index, $store.canvas.renderingSmoothness); $store.canvas.isAutoAdvanceMode = true"
+            ></div>
+          </template>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>

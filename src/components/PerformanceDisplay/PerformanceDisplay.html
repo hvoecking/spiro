@@ -1,0 +1,35 @@
+<template x-component="performance-display">
+  <div
+    x-data="{ ...performanceDisplayComponent(), ...$el.parentElement.data() }"
+    @fps-update.window="update()"
+  >
+    <div
+      data-test-id="performance-display"
+      x-show="$store.performance.isOpen"
+      class="
+        absolute top-0 right-0 -translate-y-1 text-right
+        p-1
+        font-mono text-xs
+        text-white
+      "
+    >
+      <div
+        :class="{
+          'text-gray-500': $store.performance.fpsStatus === 'NOT_COUNTING',
+          'text-blue-500': $store.performance.fpsStatus === 'ABOUT_TO_START',
+          'text-green-300': $store.performance.fpsStatus === 'WITHIN_THRESHOLD',
+          'text-red-300': $store.performance.fpsStatus === 'BELOW_THRESHOLD',
+          'text-orange-300': $store.performance.fpsStatus === 'ABOVE_THRESHOLD',
+        }"
+      >
+        <p x-text="`#${frameCount}/${fps}FPS`"></p>
+        <p x-text="`${maxTracesPerFrame}T/f`"></p>
+        <p x-text="`${calculationTime}ms~${renderTime}ms`"></p>
+      </div>
+      <p x-text="`${totalTraces}%/${maxTotalTraces}k`"></p>
+      <p x-text="`${elapsedSeconds}s`"></p>
+      <p x-text="`${totalTracesPerSecond}kT/s`"></p>
+      <p @zoom-changed.window="update()" x-text="`${zoom}%`"></p>
+    </div>
+  </div>
+</template>

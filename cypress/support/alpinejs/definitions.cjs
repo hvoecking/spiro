@@ -1,4 +1,5 @@
-const { defineFrameworkDefinition } = require("cypress");
+import { defineFrameworkDefinition } from "cypress";
+import { mount } from "./index.mjs";
 
 module.exports = defineFrameworkDefinition({
   name: "cypress-ct-alpinejs",
@@ -6,7 +7,7 @@ module.exports = defineFrameworkDefinition({
   dependencies: {
     alpinejs: "^3.0.0",
   },
-  mount: require("./index.mjs").mount,
+  mount,
   setup: () => {
     // Any global setup logic for Alpine.js can go here
   },

@@ -1,19 +1,34 @@
 import "./style.css";
 import Alpine, { AlpineComponent } from "alpinejs";
 
-import { CanvasStore, canvasComponent } from "./components/Canvas";
+import { canvasFactory } from "./components/Canvas";
 import { seedComponent } from "./components/Seed";
 import { mnemonicsComponent } from "./components/Mnemonics";
 import { isDevMode, isTestMode } from "./Utilities";
 import { shareButton } from "./components/ShareButton/ShareButton";
-import { fpsDisplay } from "./components/FpsDisplay/FpsDisplay";
+import { performanceDisplay } from "./components/PerformanceDisplay/PerformanceDisplay";
 import { toggleSwitch } from "./components/ToggleSwitch/ToggleSwitch";
 import { getXComponents, registerXComponent } from "./components/XComponent";
+import { FpsManager } from "./services/performance/FpsManager";
+import { playerInterfaceFactory } from "./components/PlayerInterface/PlayerInterface";
+import { Player } from "./services/player/Player";
+import { playerStore } from "./services/player/PlayerStore";
+import { AutoAdvancer } from "./services/advance/Advancer";
+import { advanceSpeedSelectorFactory } from "./components/AdvancerInterface/AdvanceSpeedSelector";
 
 type AlpineWindow = Window & typeof globalThis & { Alpine: typeof Alpine };
 
 (window as AlpineWindow).Alpine = Alpine;
 
+const player = new Player();
+const fpsManager = new FpsManager();
+const advancer = new AutoAdvancer(player);
+
+Alpine.data("performanceDisplayComponent", performanceDisplay.alpineComponent);
+Alpine.data("shareButtonComponent", shareButton.alpineComponent);
+Alpine.data("toggleSwitchComponent", toggleSwitch.alpineComponent);
+Alpine.data("playerInterfaceComponent", playerInterfaceFactory(player).alpineComponent);
+Alpine.data("advanceSpeedSelectorComponent", advanceSpeedSelectorFactory(advancer).alpineComponent);
 
 function ghostImageComponent() {
   return {
@@ -26,15 +41,16 @@ function ghostImageComponent() {
     }
   };
 }
+
 Alpine.data("ghostImageComponent", ghostImageComponent);
-Alpine.data("canvasComponent", canvasComponent);
+Alpine.data("canvasComponent", canvasFactory(
+  fpsManager,
+  player,
+));
 Alpine.data("globalSettings", globalSettings);
 Alpine.data("initAlpine", initAlpine);
 Alpine.data("mnemonicsComponent", mnemonicsComponent);
 Alpine.data("seedComponent", seedComponent);
-Alpine.data("fpsDisplayComponent", fpsDisplay.alpineComponent);
-Alpine.data("shareButtonComponent", shareButton.alpineComponent);
-Alpine.data("toggleSwitchComponent", toggleSwitch.alpineComponent);
 
 export interface SideMenuStore {
   isOpen: boolean;
@@ -96,8 +112,7 @@ export function globalSettings(this: GlobalSettings) {
     checkActivity() {
       const wasActive = Date.now() - this.lastActivityTime < INACTIVITY_TIMEOUT;
       const isOpen = (Alpine.store("sideMenu") as SideMenuStore).isOpen;
-      const isPaused = (Alpine.store("canvas") as CanvasStore).isPaused;
-      this.isActive = wasActive || isOpen || isPaused || isTestMode();
+      this.isActive = wasActive || isOpen || playerStore.isPaused || isTestMode();
       if (this.isActive) {
         releaseWakeLock();
       } else {
@@ -177,4 +192,10 @@ export function initAlpine(this: InitAlpineComponent): InitAlpineComponent {
 
 document.addEventListener("DOMContentLoaded", () => {
   getXComponents().forEach(c => registerXComponent(c));
+});
+
+document.addEventListener("shutdown", () => {
+  document.body.childNodes.forEach(node => {
+    node.remove();
+  });
 });
