@@ -1,43 +1,46 @@
+import Alpine from "alpinejs";
 import init from "../build/release.wasm?init";
+
 import { CanvasStore } from "./components/Canvas";
+import { particleEngineStore, Point } from "./ParticleEngineStore";
 
 export const PHYSICAL_MAX_TRACES_PER_FRAME = 340000;
 export const PARTICLE_STATE_SIZE = 9;
 
-class SeededRNG {
-  private a: bigint = BigInt(1664525);
-  private c: bigint = BigInt(1013904223);
-  private m: bigint = BigInt(2 ** 32); // Using a 32-bit LCG here
-  private state: bigint;
+// class SeededRNG {
+//   private a: bigint = BigInt(1664525);
+//   private c: bigint = BigInt(1013904223);
+//   private m: bigint = BigInt(2 ** 32); // Using a 32-bit LCG here
+//   private state: bigint;
 
-  constructor(seed: string) {
-    if (seed.length !== 128) {
-      throw new Error("Seed must be 128 bits");
-    }
-    // Split the seed into two 64-bit parts
-    const part1 = BigInt("0b" + seed.slice(0, 64));
-    const part2 = BigInt("0b" + seed.slice(64, 128));
-    this.state = (part1 ^ part2) % this.m;
-  }
+//   constructor(seed: string) {
+//     if (seed.length !== 128) {
+//       throw new Error("Seed must be 128 bits");
+//     }
+//     // Split the seed into two 64-bit parts
+//     const part1 = BigInt("0b" + seed.slice(0, 64));
+//     const part2 = BigInt("0b" + seed.slice(64, 128));
+//     this.state = (part1 ^ part2) % this.m;
+//   }
 
-  // Generate a new random integer
-  private nextInt(): bigint {
-    this.state = (this.a * this.state + this.c) % this.m;
-    return this.state;
-  }
+//   // Generate a new random integer
+//   private nextInt(): bigint {
+//     this.state = (this.a * this.state + this.c) % this.m;
+//     return this.state;
+//   }
 
-  // Generate a float between min and max (inclusive)
-  public nextSign(): number {
-    return this.nextFloat() < 0.5 ? 1 : -1;
-  }
+//   // Generate a float between min and max (inclusive)
+//   public nextSign(): number {
+//     return this.nextFloat() < 0.5 ? 1 : -1;
+//   }
 
-  // Generate a float between min and max (inclusive)
-  public nextFloat(min: number = 0, max: number = 1): number {
-    const range = max - min;
-    const scaled = Number(this.nextInt()) / Number(this.m);
-    return min + scaled * range;
-  }
-}
+//   // Generate a float between min and max (inclusive)
+//   public nextFloat(min: number = 0, max: number = 1): number {
+//     const range = max - min;
+//     const scaled = Number(this.nextInt()) / Number(this.m);
+//     return min + scaled * range;
+//   }
+// }
 
 
 // Create a WebAssembly Memory instance. This part should match your AssemblyScript's
@@ -126,103 +129,6 @@ if (wasmMemory !== null) {
   }, 100);
 }
 
-export class Point {
-  constructor(public x: number, public y: number) {}
-
-  subtract(other: Point) {
-    return new Point(this.x - other.x, this.y - other.y);
-  }
-
-  scale(factor: number) {
-    return new Point(this.x * factor, this.y * factor);
-  }
-}
-
-export class ParticleConfig {
-  readonly add: Point;
-  readonly gravity: number;
-  readonly mul: Point;
-  readonly initPosition: Point;
-  readonly initVelocity: Point;
-  readonly color: Color;
-
-  constructor(
-    readonly center: Point,
-    readonly isShapesMode: boolean,
-    readonly scale: number,
-    readonly seed: string[],
-    useRNG: boolean = false,
-  ) {
-    if (useRNG) {
-      const rng = new SeededRNG(seed.join(""));
-      this.initPosition = new Point(
-        rng.nextFloat(-center.x, center.x),
-        rng.nextFloat(-center.y, center.y),
-      );
-      this.initVelocity = new Point(
-        rng.nextFloat(20, 30)*rng.nextSign(),
-        rng.nextFloat(20, 30)*rng.nextSign(),
-      );
-      this.gravity = rng.nextFloat(1000, 2000);
-    } else {
-      this.initPosition = new Point(
-        this.parseSingnedSlice(0, 16),
-        this.parseSingnedSlice(16, 16),
-      );
-      this.initVelocity = new Point(
-        this.parseSign(32) * 2 ** 8 + this.parseSingnedSlice(32, 16) * 2,
-        this.parseSign(48) * 2 ** 8 + this.parseSingnedSlice(48, 16) * 2,
-      );
-      this.gravity = 2**17 + this.parseUnsingnedSlice(64, 16);
-    }
-    this.color = new Color(
-      (this.parseUnsingnedSlice(80, 9) / 2 ** 9) * 360,
-      50 + (this.parseUnsingnedSlice(89, 7) / 2 ** 7) * 100,
-      50,
-    );
-    this.add = new Point(
-      this.parseSingnedSlice(96, 8) / 10,
-      this.parseSingnedSlice(104, 8) / 10,
-    );
-    this.mul = new Point(
-      this.parseUnsingnedSlice(112, 8) / 100,
-      this.parseUnsingnedSlice(120, 8) / 100,
-    );
-  }
-
-  private parseUnsingnedSlice(index: number, length: number) {
-    return parseInt(this.seed.slice(index, index + length).join(""), 2);
-  }
-  private parseSign(index: number) {
-    return this.seed[index] === "0" ? 1 : -1;
-  }
-  private parseSingnedSlice(index: number, length: number) {
-    return this.parseSign(index) * this.parseUnsingnedSlice(index + 1, length - 1);
-  }
-}
-
-export class ParticleEngineConfig {
-  constructor(
-    readonly minMultiplier: number,
-    readonly maxMultiplier: number,
-    readonly initTracesPerFrame: number,
-    readonly particleConfig: ParticleConfig,
-    readonly immediateFeedback: boolean,
-    ) {}
-}
-
-class Color {
-  constructor(
-    readonly hue: number,
-    readonly saturation: number,
-    readonly value: number,
-  ) {}
-
-  toString() {
-    return `hsl(${this.hue},${this.saturation}%,${this.value}%)`;
-  }
-}
-
 class Particle {
   // Keeps track of properly scaled values
   private position: Point;
@@ -232,24 +138,20 @@ class Particle {
   private mul: Point;
 
   constructor(
-    readonly config: ParticleConfig,
   ) {
     // Alias for readabilty
-    const c = config;
-    this.position = c.center.subtract(c.initPosition.scale(c.scale));
-    this.velocity = c.initVelocity.scale(c.scale);
-    this.gravity = c.gravity*c.scale;
-    if (c.isShapesMode) {
-      this.add = c.add.scale(c.scale);
-      this.mul = c.mul.scale(1);
+    const s = particleEngineStore;
+    this.position = s.center.subtract(s.initPosition.scale(s.scale));
+    this.velocity = s.initVelocity.scale(s.scale);
+    this.gravity = s.gravity * s.scale;
+    const canvasStore = Alpine.store("canvas") as CanvasStore;
+    if (canvasStore.isShapesMode) {
+      this.add = s.add.scale(s.scale);
+      this.mul = s.mul.scale(1);
     } else {
-      this.add = new Point(0, 0);
-      this.mul = new Point(1, 1);
+      this.add = Point.zero();
+      this.mul = Point.one();
     }
-  }
-
-  color(): string {
-    return this.config.color.toString();
   }
 
   store(particleStatePtr: Float64Array | Float32Array) {
@@ -289,26 +191,23 @@ class AsParticle {
 const particle = new AsParticle();
 
 export class ParticleEngine {
-  particle: Particle | null = null;
+  private particle: Particle | null = null;
   numTracesPerFrame: number = 0;
   multiplier: number = 0;
-  totalTraces: number = 0;
+  // @Gettable
+  // totalTraces: number = 0;
   frameCount = 0;
 
-  constructor(private readonly config: ParticleEngineConfig) {
+  constructor() {
     this.reset();
   }
 
-  getColor(): string {
-    return this.particle!.color();
-  }
-
   calcNumTraces(maxTracesPerFrame: number, maxTotalTraces: number) {
-    if (this.totalTraces >= maxTotalTraces) {
+    if (particleEngineStore.totalTraces >= maxTotalTraces) {
       return 0;
     }
     if (this.frameCount === 0) {
-      if (this.config.immediateFeedback) {
+      if (particleEngineStore.immediateFeedback) {
         return PHYSICAL_MAX_TRACES_PER_FRAME / 10;
       }
     }
@@ -320,7 +219,7 @@ export class ParticleEngine {
   }
 
   calculateTraces(width: number, height: number, isWasmMode: boolean, maxTracesPerFrame: number, maxTotalTraces: number) {
-    if (this.frameCount === 15 && this.config.immediateFeedback) {
+    if (this.frameCount === 15 && particleEngineStore.immediateFeedback) {
       return -1;
     }
     const numTraces = this.calcNumTraces(maxTracesPerFrame, maxTotalTraces);
@@ -366,7 +265,7 @@ export class ParticleEngine {
       }
       particle.store(particleState);
     }
-    this.totalTraces += tracesDrawn;
+    particleEngineStore.totalTraces += tracesDrawn;
     this.frameCount++;
     return tracesDrawn;
   }
@@ -374,10 +273,10 @@ export class ParticleEngine {
   reset() {
     if (particleState && traces) {
       traces.fill(0);
-      this.numTracesPerFrame = this.config.initTracesPerFrame;
-      this.multiplier = this.config.minMultiplier + Math.random() * (this.config.maxMultiplier - this.config.minMultiplier);
-      this.totalTraces = 0;
-      this.particle = new Particle(this.config.particleConfig);
+      this.numTracesPerFrame = particleEngineStore.initTracesPerFrame;
+      this.multiplier = particleEngineStore.minMultiplier + Math.random() * (particleEngineStore.maxMultiplier - particleEngineStore.minMultiplier);
+      particleEngineStore.totalTraces = 0;
+      this.particle = new Particle();
       this.particle.store(particleState);
     }
   }

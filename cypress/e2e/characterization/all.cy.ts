@@ -2,27 +2,17 @@
 /// <reference types="cypress" />
 
 import "cypress-real-events";
+import { APP_TEST_URL, setAnimationAndTransitionTimesToZero, shutdown } from "../utils";
 
 context("All", () => {
+
   beforeEach(() => {
-    cy.visit("http://localhost:5173/?test=true");
+    cy.visit(APP_TEST_URL);
+    setAnimationAndTransitionTimesToZero();
+  });
 
-    cy.window().then((win) => {
-      // Override or alter JavaScript functions responsible for delays and animations
-      win.someDelayFunction = () => {};
-
-      // Or directly alter CSS properties responsible for animations
-      cy.document().then((doc) => {
-        const style = doc.createElement("style");
-        style.innerHTML = `
-          * {
-            transition-duration: 0s !important;
-            animation-duration: 0s !important;
-          }
-        `;
-        doc.head.appendChild(style);
-      });
-    });
+  afterEach(() => {
+    shutdown();
   });
 
   it("should pause on toggle switch to auto advance off", () => {
@@ -31,7 +21,7 @@ context("All", () => {
     cy.get("[data-test-id='speed-fast-icon']").should("be.visible").click();
 
     // When I click on the auto advance toggle
-    cy.get("[data-test-id='autoAvanceModeToggle']").realClick({ force: true });
+    cy.get("[data-test-id='autoAvanceModeToggle']").realClick();
 
     cy.get(".play-icon").should("be.visible");
   });
@@ -42,7 +32,7 @@ context("All", () => {
     cy.get("[data-test-id='primary-share-button-popup']").should("not.be.visible");
 
     // When I click on the share button
-    cy.get("[data-test-id='primary-share-button-icon']").realClick({ force: true });
+    cy.get("[data-test-id='primary-share-button-icon']").realClick();
 
     // Then the share popup should be visible
     cy.get("[data-test-id='primary-share-button-popup']").should("be.visible");

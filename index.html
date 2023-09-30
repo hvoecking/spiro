@@ -17,7 +17,10 @@
     }"
     x-cloak
     x-data="initAlpine()"
-    class="overflow-hidden"
+    class="
+      absolute top-0 left-0 w-full h-full
+      overflow-hidden
+    "
   >
     <div
       x-show="!initAnimationTriggered"
@@ -35,8 +38,9 @@
       SPIRO
     </div>
     <canvas
-      @click="$dispatch('escape')"
+      @click="$dispatch('escape'); player.togglePause()"
       x-data="canvasComponent()"
+      @pause-changed.window="pauseChanged()"
       x-ref="canvas"
       class="
         absolute w-full h-full left-0 top-0 z-0
@@ -46,7 +50,7 @@
       data-test-id="canvas"
     ></canvas>
 
-    <x-fps-display></x-fps-display>
+    <x-performance-display></x-performance-display>
 
     <div
       :class="{
@@ -70,267 +74,274 @@
       id="side-menu"
       data-test-id="side-menu"
     >
-      <div
-        @click="$store.sideMenu.isOpen = !$store.sideMenu.isOpen"
-        class="
-          /* Layout and Box Model */
-          flex p-2
+      <!-- Outer flex container -->
+      <div class="flex flex-col h-full">
 
-          /* Flexbox & Grid */
-          items-center justify-between
-
-          /* Visuals */
-          bg-gray-800 text-white hover:bg-gray-600
-
-          /* Interactivity */
-          cursor-pointer
-        "
-        data-test-id="settings"
-      >
-        <p>Settings</p>
-        <span
-          :class="{
-            '-left-full': !initAnimationStarted,
-            'opacity-0': !isActive,
-            'opacity-80 hover:opacity-100': isActive && !$store.sideMenu.isOpen,
-            'relative': !($store.sideMenu.isOpen && initAnimationStarted),
-            'translate-x-12': !$store.sideMenu.isOpen && initAnimationStarted,
-            'translate-x-1 rotate-180': $store.sideMenu.isOpen,
-          }"
-          class="
-            transition-transform
-            pr-4
-            origin-left
-            text-xl font-bold
-            text-white
-            select-none cursor-pointer
-            duration-300
-          "
-        >
-         ›
-        </span>
-      </div>
-      <div
-        class="
-          flex items-center justify-between
-          p-2
-          bg-gray-700 text-white hover:bg-gray-600
-          cursor-pointer
-        "
-        @click="$store.canvas.toggleFullScreen()"
-      >
-        <div>
-          <p>Full Screen</p>
-        </div>
-        <div
-          :class="{
-            '-left-full': !initAnimationStarted,
-            'opacity-0': !isActive,
-            'opacity-80 hover:opacity-100': isActive && !$store.sideMenu.isOpen,
-            'relative': !($store.sideMenu.isOpen && initAnimationStarted),
-            'translate-x-16': (!$store.sideMenu.isOpen && initAnimationStarted),
-          }"
-          class="
-            inline-block
-            align-middle
-            w-10
-            mr-2
-            transition duration-200 ease-in
-            overflow-visible select-none
-            slide-in
-          "
-        >
-          <div class="full-screen-icon translate-x-2 w-6 h-6"></div>
-        </div>
-      </div>
-
-      <x-toggle-switch
-        :data-hint="'Switch to ' + (isDarkMode ? 'light' : 'dark') + ' mode'"
-        data-breakout
-        data-icon-left="is-dark-mode-false-icon"
-        data-icon-right="is-dark-mode-true-icon"
-        data-id="darkModeToggle"
-        data-label="Dark Mode"
-        data-model="isDarkMode"
-        x-data="{
-          click: () => toggleDarkMode(),
-          model: isDarkMode,
-        }"
-      >
-      </x-toggle-switch>
-
-      <x-toggle-switch
-        :data-hint="'Switch to ' + ($store.canvas.isShapesMode ? 'shapes' : 'circles') + ' mode'"
-        data-breakout
-        data-icon-left="is-shape-mode-false-icon"
-        data-icon-right="is-shape-mode-true-icon"
-        data-id="shapesModeToggle"
-        data-label="Spiro Type"
-        data-model="$store.canvas.isShapesMode"
-        x-data="{
-          click: () => $store.canvas.toggleShapesMode(),
-          model: $store.canvas.isShapesMode,
-        }"
-      >
-      </x-toggle-switch>
-
-      <x-toggle-switch
-        :data-hint="'Switch to ' + (model ? 'Single Seed' : 'Auto-Advance') + ' mode'"
-        data-breakout
-        data-id="autoAvanceModeToggle"
-        data-label="Progression"
-        data-model="$store.canvas.isAutoAdvanceMode"
-        data-test-id="auto-advance"
-        data-text-left="1"
-        data-text-right="∞"
-        x-data="{
-          click: () => $store.canvas.toggleAutoAdvanceMode(),
-          model: $store.canvas.isAutoAdvanceMode,
-        }"
-      >
-      </x-toggle-switch>
-
-      <div
-        @click="$store.sideMenu.isAdvancedMenuOpen = !$store.sideMenu.isAdvancedMenuOpen"
-        class="flex items-center justify-between p-2 bg-gray-800 text-white hover:bg-gray-600 cursor-pointer"
-      >
-        <p>Advanced Settings</p>
-        <span
-          :class="{
-            'rotate-0': !$store.sideMenu.isAdvancedMenuOpen,
-            'rotate-90': $store.sideMenu.isAdvancedMenuOpen,
-          }"
-          class="
-            transition-transform
-            mr-4
-            text-xl font-bold
-            text-white
-            select-none cursor-pointer
-            duration-300
-          "
-        >
-         ›
-        </span>
-      </div>
-
-      <!-- Advanced Options -->
-      <div
-        x-show="$store.sideMenu.isAdvancedMenuOpen"
-        x-transition:enter="transition ease-out duration-300"
-        x-transition:enter-start="opacity-0 transform -translate-y-2"
-        x-transition:enter-end="opacity-100 transform translate-y-0"
-        x-transition:leave="transition ease-in duration-300"
-        x-transition:leave-start="opacity-100 transform translate-y-0"
-        x-transition:leave-end="opacity-0 transform -translate-y-2"
-      >
-        <x-toggle-switch
-          :data-hint="'Click to ' + ($store.canvas.isFpsShown ? 'hide' : 'show') + ' FPS'"
-          data-id="fpsModeToggle"
-          data-label="Frames per Second"
-          data-model="$store.canvas.isFpsShown"
-          x-data="{
-            click: () => $store.canvas.isFpsShown = !$store.canvas.isFpsShown,
-            model: $store.canvas.isFpsShown,
-          }"
-        >
-        </x-toggle-switch>
-        <x-toggle-switch
-          :data-hint="'Switch to ' + ($store.canvas.isHighPrecisionMode ? 'Float32' : 'Float64') + ' mode'"
-          data-id="precisionModeToggle"
-          data-label="Precision"
-          data-model="$store.canvas.isHighPrecisionMode"
-          x-data="{
-            click: () => $store.canvas.togglePrecisionMode(),
-            model: $store.canvas.isHighPrecisionMode,
-          }"
-        >
-        </x-toggle-switch>
-
-        <div
-          @click="$store.sideMenu.isExperimentalMenuOpen = !$store.sideMenu.isExperimentalMenuOpen"
-          class="flex items-center justify-between p-2 bg-gray-800 text-white hover:bg-gray-600 cursor-pointer"
-        >
-          <p>Experimental Settings</p>
-          <span
-            :class="{
-              'rotate-0': !$store.sideMenu.isExperimentalMenuOpen,
-              'rotate-90': $store.sideMenu.isExperimentalMenuOpen,
-            }"
+        <!-- Inner scrollable container -->
+        <div class="flex-grow">
+          <div
+            @click="$store.sideMenu.isOpen = !$store.sideMenu.isOpen"
             class="
-              transition-transform
-              mr-4
-              text-xl font-bold
-              text-white
-              select-none cursor-pointer
-              duration-300
-            "
-          >
-          ›
-          </span>
-        </div>
+              /* Layout and Box Model */
+              flex p-2
 
-        <!-- Experimental Settings -->
-        <div
-          x-show="$store.sideMenu.isExperimentalMenuOpen"
-          x-transition:enter="transition ease-out duration-300"
-          x-transition:enter-start="opacity-0 transform -translate-y-2"
-          x-transition:enter-end="opacity-100 transform translate-y-0"
-          x-transition:leave="transition ease-in duration-300"
-          x-transition:leave-start="opacity-100 transform translate-y-0"
-          x-transition:leave-end="opacity-0 transform -translate-y-2"
-        >
-          <x-toggle-switch
-            :data-hint="'Switch to ' + ($store.canvas.isWasmMode ? 'JavaScript' : 'WebAssembly') + ' mode'"
-            :disabled="!$store.canvas.isWasmModuleLoaded"
-            data-id="wasmModeToggle"
-            data-label="Execution"
-            data-model="$store.canvas.isWasmMode"
-            x-data="{
-              click: () => $store.canvas.toggleWasmMode(),
-              model: $store.canvas.isWasmMode,
-            }"
+              /* Flexbox & Grid */
+              items-center justify-between
+
+              /* Visuals */
+              bg-gray-800 text-white hover:bg-gray-600
+
+              /* Interactivity */
+              cursor-pointer
+            "
+            data-test-id="settings"
           >
-          </x-toggle-switch>
-          <x-toggle-switch
-            :data-hint="'Switch to ' + ($store.canvas.isRenderVelocity ? 'not' : '') + ' rendering velocity'"
-            data-id="velocityModeToggle"
-            data-label="Velocity"
-            data-model="$store.canvas.isRenderVelocity"
-            x-data="{
-              click: () => $store.canvas.isRenderVelocity = !$store.canvas.isRenderVelocity,
-              model: $store.canvas.isRenderVelocity,
-            }"
-          >
-          </x-toggle-switch>
-          <!-- Rendering Smoothness Slider -->
+            <p>Settings</p>
+            <span
+              :class="{
+                '-left-full': !initAnimationStarted,
+                'opacity-0': !isActive,
+                'opacity-80 hover:opacity-100': isActive && !$store.sideMenu.isOpen,
+                'relative': !($store.sideMenu.isOpen && initAnimationStarted),
+                'translate-x-12': !$store.sideMenu.isOpen && initAnimationStarted,
+                'translate-x-1 rotate-180': $store.sideMenu.isOpen,
+              }"
+              class="
+                transition-transform
+                pr-4
+                origin-left
+                text-xl font-bold
+                text-white
+                select-none cursor-pointer
+                duration-300
+              "
+            >
+            ›
+            </span>
+          </div>
           <div
             class="
               flex items-center justify-between
               p-2
-              text-white bg-gray-700 hover:bg-gray-600
+              bg-gray-700 text-white hover:bg-gray-600
+              cursor-pointer
+            "
+            @click="$store.canvas.toggleFullScreen()"
+          >
+            <div>
+              <p>Full Screen</p>
+            </div>
+            <div
+              :class="{
+                '-left-full': !initAnimationStarted,
+                'opacity-0': !isActive,
+                'opacity-80 hover:opacity-100': isActive && !$store.sideMenu.isOpen,
+                'relative': !($store.sideMenu.isOpen && initAnimationStarted),
+                'translate-x-16': (!$store.sideMenu.isOpen && initAnimationStarted),
+              }"
+              class="
+                inline-block
+                align-middle
+                w-10
+                mr-2
+                transition duration-200 ease-in
+                overflow-visible select-none
+                slide-in
+              "
+            >
+              <div class="full-screen-icon translate-x-2 w-6 h-6"></div>
+            </div>
+          </div>
+
+          <x-toggle-switch
+            :data-hint="'Switch to ' + (isDarkMode ? 'light' : 'dark') + ' mode'"
+            data-breakout
+            data-icon-left="is-dark-mode-false-icon"
+            data-icon-right="is-dark-mode-true-icon"
+            data-id="darkModeToggle"
+            data-label="Dark Mode"
+            data-model="isDarkMode"
+            x-data="{
+              click: () => toggleDarkMode(),
+              model: isDarkMode,
+            }"
+          >
+          </x-toggle-switch>
+
+          <x-toggle-switch
+            :data-hint="'Switch to ' + ($store.canvas.isShapesMode ? 'shapes' : 'circles') + ' mode'"
+            data-breakout
+            data-icon-left="is-shape-mode-false-icon"
+            data-icon-right="is-shape-mode-true-icon"
+            data-id="shapesModeToggle"
+            data-label="Spiro Type"
+            data-model="$store.canvas.isShapesMode"
+            x-data="{
+              click: () => $store.canvas.toggleShapesMode(),
+              model: $store.canvas.isShapesMode,
+            }"
+          >
+          </x-toggle-switch>
+
+          <x-toggle-switch
+            :data-hint="'Switch to ' + (model ? 'Single Seed' : 'Auto-Advance') + ' mode'"
+            data-breakout
+            data-id="autoAvanceModeToggle"
+            data-label="Progression"
+            data-model="$store.canvas.isAutoAdvanceMode"
+            data-test-id="auto-advance"
+            data-text-left="1"
+            data-text-right="∞"
+            x-data="{
+              click: () => $store.canvas.toggleAutoAdvanceMode(),
+              model: $store.canvas.isAutoAdvanceMode,
+            }"
+          >
+          </x-toggle-switch>
+
+          <div
+            @click="$store.sideMenu.isAdvancedMenuOpen = !$store.sideMenu.isAdvancedMenuOpen"
+            class="flex items-center justify-between p-2 bg-gray-800 text-white hover:bg-gray-600 cursor-pointer"
+          >
+            <p>Advanced Settings</p>
+            <span
+              :class="{
+                'rotate-0': !$store.sideMenu.isAdvancedMenuOpen,
+                'rotate-90': $store.sideMenu.isAdvancedMenuOpen,
+              }"
+              class="
+                transition-transform
+                mr-4
+                text-xl font-bold
+                text-white
+                select-none cursor-pointer
+                duration-300
+              "
+            >
+            ›
+            </span>
+          </div>
+
+          <!-- Advanced Options -->
+          <div
+            x-show="$store.sideMenu.isAdvancedMenuOpen"
+            x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0 transform -translate-y-2"
+            x-transition:enter-end="opacity-100 transform translate-y-0"
+            x-transition:leave="transition ease-in duration-300"
+            x-transition:leave-start="opacity-100 transform translate-y-0"
+            x-transition:leave-end="opacity-0 transform -translate-y-2"
+          >
+            <x-toggle-switch
+              :data-hint="'Click to ' + ($store.performance.isOpen ? 'hide' : 'show') + ' FPS'"
+              data-id="fpsModeToggle"
+              data-label="Frames per Second"
+              data-model="$store.performance.isOpen"
+              x-data="{
+                click: () => $store.performance.isOpen = !$store.performance.isOpen,
+                model: $store.performance.isOpen,
+              }"
+            >
+            </x-toggle-switch>
+            <x-toggle-switch
+              :data-hint="'Switch to ' + ($store.canvas.isHighPrecisionMode ? 'Float32' : 'Float64') + ' mode'"
+              data-id="precisionModeToggle"
+              data-label="Precision"
+              data-model="$store.canvas.isHighPrecisionMode"
+              x-data="{
+                click: () => $store.canvas.togglePrecisionMode(),
+                model: $store.canvas.isHighPrecisionMode,
+              }"
+            >
+            </x-toggle-switch>
+
+            <div
+              @click="$store.sideMenu.isExperimentalMenuOpen = !$store.sideMenu.isExperimentalMenuOpen"
+              class="flex items-center justify-between p-2 bg-gray-800 text-white hover:bg-gray-600 cursor-pointer"
+            >
+              <p>Experimental Settings</p>
+              <span
+                :class="{
+                  'rotate-0': !$store.sideMenu.isExperimentalMenuOpen,
+                  'rotate-90': $store.sideMenu.isExperimentalMenuOpen,
+                }"
+                class="
+                  transition-transform
+                  mr-4
+                  text-xl font-bold
+                  text-white
+                  select-none cursor-pointer
+                  duration-300
+                "
+              >
+              ›
+              </span>
+            </div>
+
+            <!-- Experimental Settings -->
+            <div
+              x-show="$store.sideMenu.isExperimentalMenuOpen"
+              x-transition:enter="transition ease-out duration-300"
+              x-transition:enter-start="opacity-0 transform -translate-y-2"
+              x-transition:enter-end="opacity-100 transform translate-y-0"
+              x-transition:leave="transition ease-in duration-300"
+              x-transition:leave-start="opacity-100 transform translate-y-0"
+              x-transition:leave-end="opacity-0 transform -translate-y-2"
+            >
+              <x-toggle-switch
+                :data-hint="'Switch to ' + ($store.canvas.isWasmMode ? 'JavaScript' : 'WebAssembly') + ' mode'"
+                :disabled="!$store.canvas.isWasmModuleLoaded"
+                data-id="wasmModeToggle"
+                data-label="Execution"
+                data-model="$store.canvas.isWasmMode"
+                x-data="{
+                  click: () => $store.canvas.toggleWasmMode(),
+                  model: $store.canvas.isWasmMode,
+                }"
+              >
+              </x-toggle-switch>
+              <x-toggle-switch
+                :data-hint="'Switch to ' + ($store.canvas.isRenderVelocity ? 'not' : '') + ' rendering velocity'"
+                data-id="velocityModeToggle"
+                data-label="Velocity"
+                data-model="$store.canvas.isRenderVelocity"
+                x-data="{
+                  click: () => $store.canvas.isRenderVelocity = !$store.canvas.isRenderVelocity,
+                  model: $store.canvas.isRenderVelocity,
+                }"
+              >
+              </x-toggle-switch>
+              <!-- Rendering Smoothness Slider -->
+              <div
+                class="
+                  flex items-center justify-between
+                  p-2
+                  text-white bg-gray-700 hover:bg-gray-600
+                  cursor-pointer
+                "
+              >
+                <div>Rendering Smoothness</div>
+                <input class="w-full" type="range" min="1" max="10" step="0.1" :value="$store.canvas.renderingSmoothness**2" @input="$store.canvas.setRenderingSmoothness(Math.sqrt($event.target.valueAsNumber))">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div
+          @click="$store.about.open = !$store.about.open"
+          class="flex items-center justify-between p-2 bg-gray-700 text-white hover:bg-gray-600 cursor-pointer"
+        >
+          <p>About</p>
+          <span
+            class="
+              info-icon
+              mr-4
+              h-4 w-4
               cursor-pointer
             "
           >
-            <div>Rendering Smoothness</div>
-            <input class="w-full" type="range" min="1" max="10" step="0.1" :value="$store.canvas.renderingSmoothness**2" @input="$store.canvas.setRenderingSmoothness(Math.sqrt($event.target.valueAsNumber))">
-          </div>
+          </span>
         </div>
-      </div>
-
-      <div
-        @click="$store.about.open = !$store.about.open"
-        class="flex items-center justify-between p-2 bg-gray-700 text-white hover:bg-gray-600 cursor-pointer"
-      >
-        <p>About</p>
-        <span
-          class="
-            info-icon
-            mr-4
-            h-4 w-4
-            cursor-pointer
-          "
-        >
-        </span>
       </div>
     </div>
 
@@ -345,8 +356,8 @@
       x-transition:leave-start="opacity-100"
       x-transition:leave-end="opacity-0 blur"
       class="
-        fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
-        w-96 h-64
+        fixed top-1/2 left-1/2 z-30 -translate-x-1/2 -translate-y-1/2
+        w-96 h-60
         rounded-lg
         backdrop-blur-lg
       "
@@ -361,27 +372,18 @@
       x-transition:leave-start="opacity-100 scale-100"
       x-transition:leave-end="opacity-0 scale-110 blur"
       class="
-        fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
+        fixed top-1/2 left-1/2 z-30 -translate-x-1/2 -translate-y-1/2
         flex items-center justify-center
         p-2
         bg-transparent
       "
       data-test-id="about"
     >
-      <div class="bg-black bg-opacity-50 rounded-lg p-4 w-96 h-64 text-white">
+      <div class="bg-black bg-opacity-50 rounded-lg p-4 w-96 h-60 text-white">
         <h4 class="text-2xl font-semibold mb-4">About Spiro</h4>
 
-        <p class="text-base mb-4">
-          <strong>Spiro</strong> is a digital art tool that visualizes a particle's chaotic orbit around a black hole. Save, load, and share your patterns using a 128-bit, BIP39 mnemonic seed using the
-          <span><x-share-button
-            class="
-              fixed
-            "
-            data-id="about-share-button"
-          >
-          </x-share-button></span>
-          &nbsp; &nbsp;
-          button.
+        <p class="text-base mb-4 text-justify text-sm">
+          <strong>Spiro</strong> is a digital art tool that visualizes a particle's chaotic orbit around a black hole. Save, load, and share your patterns using a 128-bit, BIP39 mnemonic seed using the share button in the lower right corner.
         </p>
 
         <p class="text-sm">
@@ -414,7 +416,7 @@
     >
       <div
         @click="$store.about.open = !$store.about.open"
-        x-show="!$store.canvas.isFpsShown && !$store.about.open"
+        x-show="!$store.performance.isOpen && !$store.about.open"
         class="
           w-4 h-4
           opacity-80 hover:opacity-100
@@ -505,7 +507,7 @@
       x-data="ghostImageComponent()"
       @pause-changed.window="triggerGhostImage()"
     >
-    <!-- Floating Video Player Overlay -->
+      <!-- Floating Video Player Overlay -->
       <div class="flex flex-col items-center justify-center p-0 bg-transparent">
         <!-- Video Controls -->
         <div class="flex items-center space-x-20 text-white">
@@ -514,8 +516,8 @@
             x-show="showGhostImage"
             x-transition:leave="transition duration-500 ease-in-out opacity-0 scale-[2.5]"
             :class="{
-              'play-icon': $store.canvas.isPaused,
-              'pause-icon': !$store.canvas.isPaused,
+              'play-icon': $store.player.isPaused,
+              'pause-icon': !$store.player.isPaused,
             }"
             class="cursor-pointer w-8 h-8"
           >
@@ -536,21 +538,7 @@
         slide-in
       "
     >
-      <!-- Floating Video Player Overlay -->
-      <div class="flex flex-col items-center justify-center p-0 bg-transparent">
-        <!-- Video Controls -->
-        <div class="flex items-center space-x-20 text-white">
-          <div @click="$store.mnemonics.previousMnemonic()" class="previous-icon opacity-80 hover:opacity-100 cursor-pointer w-8 h-8"></div>
-            <div @click="$store.canvas.togglePause()"
-              :class="{
-                'play-icon': $store.canvas.isPaused,
-                'pause-icon': !$store.canvas.isPaused,
-              }"
-              class="opacity-80 hover:opacity-100 cursor-pointer w-8 h-8"
-            ></div>
-          <div @click="$store.mnemonics.nextMnemonic()" class="next-icon opacity-80 hover:opacity-100 cursor-pointer w-8 h-8"></div>
-        </div>
-      </div>
+      <x-player-interface></x-player-interface>
     </div>
     <div
       :class="{
@@ -569,42 +557,7 @@
         bottom-0
       "
     >
-      <div>
-        <div x-data="{ speeds: $store.canvas.speeds }" class="flex flex-col items-center mt-7">
-          <!-- Slider -->
-          <input
-          class="
-            w-full
-            h-1
-            bg-transparent backdrop-blur-sm
-            border border-zinc-500/50
-            rounded-full
-            appearance-none
-            cursor-pointer
-            slider-thumb
-          "
-            id="speedSlider"
-            :max="speeds.length - 1"
-            :value="speeds.indexOf($store.canvas.autoAdvanceSpeed)"
-            min="0"
-            step="1"
-            type="range"
-            @input="$store.canvas.setAutoAdvanceSpeed(speeds[$event.target.valueAsNumber]); $store.canvas.isAutoAdvanceMode = true"
-          />
-
-          <!-- Icons -->
-          <div class="flex justify-between w-full my-3">
-            <template x-for="(speed, index) in speeds" :key="index">
-              <div
-                class="w-5 h-5 cursor-pointer"
-                :data-test-id="'speed-' + speed + '-icon'"
-                :class="'speed-' + speed + '-icon ' + ($store.canvas.autoAdvanceSpeed === speed && $store.canvas.isAutoAdvanceMode ? 'opacity-100': 'opacity-50')"
-                @click="$store.canvas.setAutoAdvanceSpeed(index); $store.canvas.isAutoAdvanceMode = true"
-              ></div>
-            </template>
-          </div>
-        </div>
-      </div>
+      <x-speed-selector></x-speed-selector>
     </div>
 
     <div
