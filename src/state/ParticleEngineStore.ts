@@ -1,29 +1,11 @@
 import Alpine from "alpinejs";
-import { AutoAdvanceSpeeds, INITIAL_AUTO_ADVANCE_SPEED } from "./services/advance/AdvancerStore";
-import { clamp } from "./Utilities";
-import { PHYSICAL_MAX_TRACES_PER_FRAME } from "./ParticleEngine";
-import { RENDERING_SMOOTHNESS_TRACES_FACTOR } from "./services/advance/Advancer";
-import { seedStore } from "./components/Seed";
-
-
-export class Point {
-  static zero() {
-    return new Point(0, 0);
-  }
-  static one() {
-    return new Point(1, 1);
-  }
-
-  constructor(public x: number, public y: number) {}
-
-  subtract(other: Point) {
-    return new Point(this.x - other.x, this.y - other.y);
-  }
-
-  scale(factor: number) {
-    return new Point(this.x * factor, this.y * factor);
-  }
-}
+import { AutoAdvanceSpeeds, INITIAL_AUTO_ADVANCE_SPEED } from "./AdvancerStore";
+import { clamp } from "../Utilities";
+import { RENDERING_SMOOTHNESS_TRACES_FACTOR } from "../services/AutoAdvancer/Advancer";
+import { seedStore } from "../components/Seed";
+import { PHYSICAL_MAX_TRACES_PER_FRAME } from "../services/State/CalculationHandler";
+import { Point } from "../services/ParticleEngine/Point";
+import { resetHandler } from "../services/reset/ResetHandler";
 
 export const MAX_TRACES_PER_FRAME = {
   [AutoAdvanceSpeeds.SLOW]: 200,
@@ -103,35 +85,20 @@ const _particleEngineStore = {
     immediateFeedback: boolean,
     center: Point,
     scale: number,
-    useRNG: boolean = false,
   ) {
     this.currentMaxTotalTraces = this.maxTotalTraces;
     this.immediateFeedback = immediateFeedback;
     this.center = center;
     this.scale = scale;
-
-    if (useRNG) {
-      // const rng = new SeededRNG(seedStore.seed.join(""));
-      // this.initPosition = new Point(
-      //   rng.nextFloat(-center.x, center.x),
-      //   rng.nextFloat(-center.y, center.y),
-      // );
-      // this.initVelocity = new Point(
-      //   rng.nextFloat(20, 30)*rng.nextSign(),
-      //   rng.nextFloat(20, 30)*rng.nextSign(),
-      // );
-      // this.gravity = rng.nextFloat(1000, 2000);
-    } else {
-      this.initPosition = new Point(
-        parseSingnedSlice(0, 16),
-        parseSingnedSlice(16, 16),
-      );
-      this.initVelocity = new Point(
-        parseSign(32) * 2 ** 8 + parseSingnedSlice(32, 16) * 2,
-        parseSign(48) * 2 ** 8 + parseSingnedSlice(48, 16) * 2,
-      );
-      this.gravity = 2**17 + parseUnsingnedSlice(64, 16);
-    }
+    this.initPosition = new Point(
+      parseSingnedSlice(0, 16),
+      parseSingnedSlice(16, 16),
+    );
+    this.initVelocity = new Point(
+      parseSign(32) * 2 ** 8 + parseSingnedSlice(32, 16) * 2,
+      parseSign(48) * 2 ** 8 + parseSingnedSlice(48, 16) * 2,
+    );
+    this.gravity = 2**17 + parseUnsingnedSlice(64, 16);
     this.color = new Color(
       (parseUnsingnedSlice(80, 9) / 2 ** 9) * 360,
       50 + (parseUnsingnedSlice(89, 7) / 2 ** 7) * 100,
@@ -145,8 +112,16 @@ const _particleEngineStore = {
       parseUnsingnedSlice(112, 8) / 100,
       parseUnsingnedSlice(120, 8) / 100,
     );
+
   }
 };
 Alpine.store("particleEngine", _particleEngineStore);
 
 export const particleEngineStore = Alpine.store("particleEngine") as typeof _particleEngineStore;
+resetHandler.registerListener((store) => {
+  particleEngineStore.reset(
+    store.immediateFeedback,
+    store.center,
+    store.scale,
+  );
+});

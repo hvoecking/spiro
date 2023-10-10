@@ -1,7 +1,8 @@
 import template from "./PlayerInterface.html?raw";
 import { XComponent, XAlpineComponent } from "../XComponent";
-import { PauseEndReason, PauseStartReason } from "../../services/player/Player";
-import { Player } from "../../services/player/Player";
+import { PauseEndReason, PauseStartReason } from "../../services/Player/Player";
+import { Player } from "../../services/Player/Player";
+import { listen } from "../../Utilities";
 
 interface PlayerInterfaceComponent extends XAlpineComponent {
 }
@@ -23,7 +24,7 @@ export function playerInterfaceFactory(player: Player) {
           }
         });
 
-        document.addEventListener("shutdown", () => player.startPause(PauseStartReason.SHUTDOWN));
+        listen("shutdown", () => player.startPause(PauseStartReason.SHUTDOWN));
       },
     };
   }

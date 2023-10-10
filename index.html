@@ -169,16 +169,16 @@
           </x-toggle-switch>
 
           <x-toggle-switch
-            :data-hint="'Switch to ' + ($store.canvas.isShapesMode ? 'shapes' : 'circles') + ' mode'"
+            :data-hint="'Switch to ' + ($store.shapes.isShapesMode ? 'shapes' : 'circles') + ' mode'"
             data-breakout
             data-icon-left="is-shape-mode-false-icon"
             data-icon-right="is-shape-mode-true-icon"
             data-id="shapesModeToggle"
             data-label="Spiro Type"
-            data-model="$store.canvas.isShapesMode"
+            data-model="$store.shapes.isShapesMode"
             x-data="{
-              click: () => $store.canvas.toggleShapesMode(),
-              model: $store.canvas.isShapesMode,
+              click: () => toggleShapesMode(),
+              model: $store.shapes.isShapesMode,
             }"
           >
           </x-toggle-switch>
@@ -188,13 +188,13 @@
             data-breakout
             data-id="autoAvanceModeToggle"
             data-label="Progression"
-            data-model="$store.canvas.isAutoAdvanceMode"
+            data-model="$store.advancer.isAutoAdvanceMode"
             data-test-id="auto-advance"
             data-text-left="1"
             data-text-right="∞"
             x-data="{
-              click: () => $store.canvas.toggleAutoAdvanceMode(),
-              model: $store.canvas.isAutoAdvanceMode,
+              click: () => $store.advancer.toggleAutoAdvanceMode(),
+              model: $store.advancer.isAutoAdvanceMode,
             }"
           >
           </x-toggle-switch>
@@ -244,13 +244,13 @@
             >
             </x-toggle-switch>
             <x-toggle-switch
-              :data-hint="'Switch to ' + ($store.canvas.isHighPrecisionMode ? 'Float32' : 'Float64') + ' mode'"
+              :data-hint="'Switch to ' + ($store.calculationState.isHighPrecisionMode ? 'Float32' : 'Float64') + ' mode'"
               data-id="precisionModeToggle"
               data-label="Precision"
-              data-model="$store.canvas.isHighPrecisionMode"
+              data-model="$store.calculationState.isHighPrecisionMode"
               x-data="{
-                click: () => $store.canvas.togglePrecisionMode(),
-                model: $store.canvas.isHighPrecisionMode,
+                click: () => $store.calculationState.togglePrecisionMode(),
+                model: $store.calculationState.isHighPrecisionMode,
               }"
             >
             </x-toggle-switch>
@@ -289,14 +289,14 @@
               x-transition:leave-end="opacity-0 transform -translate-y-2"
             >
               <x-toggle-switch
-                :data-hint="'Switch to ' + ($store.canvas.isWasmMode ? 'JavaScript' : 'WebAssembly') + ' mode'"
-                :disabled="!$store.canvas.isWasmModuleLoaded"
+                :data-hint="'Switch to ' + ($store.calculationState.isWasmMode ? 'JavaScript' : 'WebAssembly') + ' mode'"
+                :disabled="!$store.calculationState.isWasmModuleLoaded"
                 data-id="wasmModeToggle"
                 data-label="Execution"
-                data-model="$store.canvas.isWasmMode"
+                data-model="$store.calculationState.isWasmMode"
                 x-data="{
-                  click: () => $store.canvas.toggleWasmMode(),
-                  model: $store.canvas.isWasmMode,
+                  click: () => $store.calculationState.toggleWasmMode(),
+                  model: $store.calculationState.isWasmMode,
                 }"
               >
               </x-toggle-switch>
@@ -560,9 +560,9 @@
       <x-speed-selector></x-speed-selector>
     </div>
 
-    <div
-      x-data="{ zoom: $store.canvas.zoom, zoomActive: false }"
-      @zoom-changed.window="zoom = $store.canvas.zoom; zoomActive = true; setTimeout(() => { zoomActive = false }, 2000)"
+    <x-zoom-slider
+      x-data="{ zoomActive: false }"
+      @zoom-changed.window="zoomActive = true; setTimeout(() => { zoomActive = false }, 2000)"
       :class="{
         'opacity-0': !isActive && !zoomActive,
         'translate-x-full': !initAnimationStarted,
@@ -578,24 +578,7 @@
         width: 50vh; /* Component is 90deg rotated so we base the width on the height */
       "
     >
-      <input
-        @input="$store.canvas.setZoom(zoom)"
-        class="
-          w-full h-1
-          bg-transparent backdrop-blur-sm
-          border border-zinc-500/50
-          rounded-full
-          appearance-none
-          cursor-pointer
-          slider-thumb
-        "
-        max="1"
-        min="0.01"
-        step="0.01"
-        type="range"
-        x-model="zoom"
-      >
-    </div>
+    </x-zoom-slider>
 
     <x-share-button
       :class="{

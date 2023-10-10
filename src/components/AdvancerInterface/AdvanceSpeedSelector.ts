@@ -1,6 +1,6 @@
 import template from "./AdvanceSpeedSelector.html?raw";
 import { XComponent, XAlpineComponent } from "../XComponent";
-import { AutoAdvancer } from "../../services/advance/Advancer";
+import { AutoAdvancer } from "../../services/AutoAdvancer/Advancer";
 
 interface AdvanceSpeedSelectorComponent extends XAlpineComponent {
 }

@@ -1,7 +1,6 @@
-import { defineFrameworkDefinition } from "cypress";
-import { mount } from "./index.mjs";
+import { mount } from "./index.js";
 
-module.exports = defineFrameworkDefinition({
+module.exports = {
   name: "cypress-ct-alpinejs",
   version: "1.0.0",
   dependencies: {
@@ -14,4 +13,4 @@ module.exports = defineFrameworkDefinition({
   teardown: () => {
     // Any global teardown logic for Alpine.js can go here
   },
-});
+};

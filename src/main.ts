@@ -4,30 +4,34 @@ import Alpine, { AlpineComponent } from "alpinejs";
 import { canvasFactory } from "./components/Canvas";
 import { seedComponent } from "./components/Seed";
 import { mnemonicsComponent } from "./components/Mnemonics";
-import { isDevMode, isTestMode } from "./Utilities";
+import { addAlpineToWindow, isDevMode, isTestMode } from "./Utilities";
 import { shareButton } from "./components/ShareButton/ShareButton";
 import { performanceDisplay } from "./components/PerformanceDisplay/PerformanceDisplay";
 import { toggleSwitch } from "./components/ToggleSwitch/ToggleSwitch";
 import { getXComponents, registerXComponent } from "./components/XComponent";
-import { FpsManager } from "./services/performance/FpsManager";
+import { FpsManager } from "./services/FpsManager/FpsManager";
 import { playerInterfaceFactory } from "./components/PlayerInterface/PlayerInterface";
-import { Player } from "./services/player/Player";
-import { playerStore } from "./services/player/PlayerStore";
-import { AutoAdvancer } from "./services/advance/Advancer";
+import { Player } from "./services/Player/Player";
+import { playerStore } from "./state/PlayerStore";
+import { AutoAdvancer } from "./services/AutoAdvancer/Advancer";
 import { advanceSpeedSelectorFactory } from "./components/AdvancerInterface/AdvanceSpeedSelector";
+import { ParticleEngine } from "./services/ParticleEngine/ParticleEngine";
+import { StateHandler } from "./services/State/CalculationHandler";
+import { zoomSliderFactory } from "./components/ZoomSlider/ZoomSlider";
 
-type AlpineWindow = Window & typeof globalThis & { Alpine: typeof Alpine };
-
-(window as AlpineWindow).Alpine = Alpine;
+addAlpineToWindow();
 
 const player = new Player();
 const fpsManager = new FpsManager();
 const advancer = new AutoAdvancer(player);
+const stateHandler = new StateHandler(ParticleEngine.calculateTracesFunction);
+const particleEngine = new ParticleEngine(stateHandler);
 
 Alpine.data("performanceDisplayComponent", performanceDisplay.alpineComponent);
 Alpine.data("shareButtonComponent", shareButton.alpineComponent);
 Alpine.data("toggleSwitchComponent", toggleSwitch.alpineComponent);
 Alpine.data("playerInterfaceComponent", playerInterfaceFactory(player).alpineComponent);
+Alpine.data("zoomSliderComponent", zoomSliderFactory().alpineComponent);
 Alpine.data("advanceSpeedSelectorComponent", advanceSpeedSelectorFactory(advancer).alpineComponent);
 
 function ghostImageComponent() {
@@ -46,6 +50,7 @@ Alpine.data("ghostImageComponent", ghostImageComponent);
 Alpine.data("canvasComponent", canvasFactory(
   fpsManager,
   player,
+  particleEngine,
 ));
 Alpine.data("globalSettings", globalSettings);
 Alpine.data("initAlpine", initAlpine);
@@ -192,6 +197,7 @@ export function initAlpine(this: InitAlpineComponent): InitAlpineComponent {
 
 document.addEventListener("DOMContentLoaded", () => {
   getXComponents().forEach(c => registerXComponent(c));
+  Alpine.nextTick(() => console.warn("VITE_APP_MODE:", import.meta.env.VITE_APP_MODE));
 });
 
 document.addEventListener("shutdown", () => {

@@ -4,7 +4,7 @@
 import "cypress-real-events";
 import { APP_TEST_URL, setAnimationAndTransitionTimesToZero, shutdown } from "../utils";
 
-context("All", () => {
+context("PerformanceDisplay", () => {
   beforeEach(() => {
     cy.visit(APP_TEST_URL);
     setAnimationAndTransitionTimesToZero();

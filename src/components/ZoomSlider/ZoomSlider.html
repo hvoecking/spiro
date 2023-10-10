@@ -1,0 +1,23 @@
+<template x-component="zoom-slider">
+  <div
+    x-data="{ ...zoomSliderComponent(), ...$el.parentElement.data() }"
+  >
+    <input
+      @input="$store.zoom.setZoom($event.target.valueAsNumber)"
+      class="
+        w-full h-1
+        bg-transparent backdrop-blur-sm
+        border border-zinc-500/50
+        rounded-full
+        appearance-none
+        cursor-pointer
+        slider-thumb
+      "
+      max="1"
+      min="0.01"
+      step="0.01"
+      type="range"
+      x-model="$store.zoom.zoom"
+    >
+  </div>
+</template>

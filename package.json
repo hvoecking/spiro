@@ -9,6 +9,7 @@
   "devDependencies": {
     "@cypress/vite-dev-server": "^5.0.6",
     "@types/alpinejs": "^3.7.2",
+    "@types/chai": "^4.3.7",
     "@types/jest": "^29.5.5",
     "@types/tailwindcss": "^3.1.0",
     "@typescript-eslint/eslint-plugin": "^6.6.0",
@@ -19,6 +20,7 @@
     "cypress-real-events": "^1.10.3",
     "cypress-vite": "^1.4.2",
     "cz-conventional-changelog": "^3.3.0",
+    "dotenv": "^16.3.1",
     "eslint": "^8.49.0",
     "husky": "^8.0.3",
     "jest": "^29.7.0",
@@ -35,9 +37,11 @@
     "build": "npm run asbuild && ./scripts/icons.sh && tsc && vite build",
     "cm": "cz",
     "dev": "npm run asbuild && vite",
+    "dev:test": "npm run asbuild && vite --mode test",
     "lint": "eslint 'src/**/*.{js,ts}'",
     "preview": "vite preview",
-    "test:e2e": "cypress open"
+    "test:e2e": "NODE_ENV=test cypress open --e2e",
+    "test": "jest"
   },
   "private": true,
   "husky": {

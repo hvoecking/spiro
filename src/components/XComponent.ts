@@ -7,7 +7,7 @@ export type XAlpineComponent = AlpineComponent<
   Record<string | symbol, unknown>
 >;
 
-type AttributeGetter = (attrName: string) => string | true | null;
+type AttributeGetter = (attrName: string) => string | boolean | null;
 
 interface DataAttributes {
   get: AttributeGetter;

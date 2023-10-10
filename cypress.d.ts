@@ -1,4 +1,4 @@
-import { mount } from "./cypress/support/alpinejs/index.mjs";
+import { mount } from "./cypress/support/alpinejs/index.js";
 
 // Augment the Cypress namespace to include type definitions for
 // your custom command.
