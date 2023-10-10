@@ -1,7 +1,7 @@
 import Alpine from "alpinejs";
 
-import { isDevMode } from "../../Utilities";
-import FpsStatus from "./FpsStatus";
+import { isDevMode } from "../Utilities";
+import FpsStatus from "../services/FpsManager/FpsStatus";
 
 const _performanceStore = {
   calculationTime: 0,

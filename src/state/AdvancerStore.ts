@@ -1,5 +1,6 @@
 import Alpine from "alpinejs";
-import { isDevMode, isTestMode } from "../../Utilities";
+import { dispatch, isDevMode, isTestMode } from "../Utilities";
+import { resetHandler } from "../services/reset/ResetHandler";
 
 export enum AutoAdvanceSpeeds {
   SLOW = "slow",
@@ -21,8 +22,18 @@ const _advancerStore = {
   autoAdvanceSpeed: INITIAL_AUTO_ADVANCE_SPEED,
   isAutoAdvanceMode: !isDevMode(),
   autoAdvanceTimestamp: Date.now(),
+
+  reset() {
+    this.autoAdvanceTimestamp = Date.now();
+  },
+
+  toggleAutoAdvanceMode() {
+    advancerStore.isAutoAdvanceMode = !advancerStore.isAutoAdvanceMode;
+    dispatch("auto-advance-mode-changed");
+  },
 };
 
 Alpine.store("advancer", _advancerStore);
 
 export const advancerStore: typeof _advancerStore = Alpine.store("advancer") as typeof _advancerStore;
+resetHandler.registerListener(() => advancerStore.reset());

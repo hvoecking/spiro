@@ -1,9 +1,9 @@
 import template from "./PerformanceDisplay.html?raw";
 import { XComponent, XAlpineComponent } from "../XComponent";
-import { performanceStore } from "../../services/performance/PerformanceStore";
-import { particleEngineStore } from "../../ParticleEngineStore";
-import { CanvasStore } from "../Canvas";
-import { advancerStore } from "../../services/advance/AdvancerStore";
+import { performanceStore } from "../../state/PerformanceStore";
+import { particleEngineStore } from "../../state/ParticleEngineStore";
+import { advancerStore } from "../../state/AdvancerStore";
+import { zoomStore } from "../../state/ZoomStore";
 
 interface PerformanceDisplayComponent extends XAlpineComponent {
   fps: string;
@@ -44,7 +44,7 @@ export function performanceDisplayComponent(this: PerformanceDisplayComponent) {
         this.elapsedSeconds = "";
         this.totalTracesPerSecond = "";
       }
-      this.zoom = ((Alpine.store("canvas") as CanvasStore).zoom * 100).toFixed();
+      this.zoom = (zoomStore.zoom * 100).toFixed();
     }
   };
 }

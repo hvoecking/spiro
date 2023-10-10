@@ -1,4 +1,4 @@
-export const APP_TEST_URL = "http://localhost:5173/?test=true";
+export const APP_TEST_URL = `http://localhost:${Cypress.env("PORT")}/`;
 
 export function setAnimationAndTransitionTimesToZero() {
   cy.window().then(() => {

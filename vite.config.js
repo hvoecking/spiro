@@ -1,8 +1,15 @@
 import path from "path";
 import watchAndRun from "vite-plugin-watch-and-run";
 
+import dotenv from "dotenv";
+
+dotenv.config({ path: `.env.${process.env.NODE_ENV}` });
+
 /** @type {import("vite").UserConfig} */
 const config = {
+  server: {
+    port: process.env.PORT,
+  },
   plugins: [
     watchAndRun([
       {
@@ -12,7 +19,8 @@ const config = {
         run: "npm run asbuild",
         delay: 300,
       },
-    ]), watchAndRun([
+    ]),
+    watchAndRun([
       {
         name: "watch-icons",
         watchKind: ["add", "change", "unlink"],
@@ -20,7 +28,8 @@ const config = {
         run: "./scripts/icons.sh",
         delay: 300,
       },
-    ]), watchAndRun([
+    ]),
+    watchAndRun([
       {
         name: "watch-icons",
         watchKind: ["add", "change", "unlink"],

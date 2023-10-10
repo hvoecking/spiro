@@ -1,10 +1,10 @@
 import Alpine from "alpinejs";
 
-import { MnemonicsStore } from "./../../components/Mnemonics";
-import { playerStore } from "./PlayerStore";
+import { MnemonicsStore } from "../../components/Mnemonics";
+import { playerStore } from "../../state/PlayerStore";
 import { dispatch } from "../../Utilities";
-import { advancerStore } from "../advance/AdvancerStore";
-import { particleEngineStore } from "../../ParticleEngineStore";
+import { advancerStore } from "../../state/AdvancerStore";
+import { particleEngineStore } from "../../state/ParticleEngineStore";
 
 // export interface Player {
 //   startPause(reason: PauseStartReason): void;
@@ -12,8 +12,13 @@ import { particleEngineStore } from "../../ParticleEngineStore";
 //   togglePause(): void;
 // }
 
+export class ResetRequest {
+  constructor(public readonly immediateFeedback: boolean) {}
+}
+
 export class Player {
   pauseStartReason: PauseStartReason | null = null;
+  resetRequest: ResetRequest | null = null;
 
   private unpause() {
     advancerStore.autoAdvanceTimestamp = Date.now();

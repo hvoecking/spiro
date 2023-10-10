@@ -1,7 +1,8 @@
-import { MAX_TOTAL_TRACES_PER_FRAME, MAX_TRACES_PER_FRAME, particleEngineStore } from "../../ParticleEngineStore";
-import { PauseEndReason, Player } from "../player/Player";
-import { playerStore } from "../player/PlayerStore";
-import { AutoAdvanceSpeeds, advancerStore } from "./AdvancerStore";
+import { MAX_TOTAL_TRACES_PER_FRAME, MAX_TRACES_PER_FRAME, particleEngineStore } from "../../state/ParticleEngineStore";
+import { listen } from "../../Utilities";
+import { PauseEndReason, Player } from "../Player/Player";
+import { playerStore } from "../../state/PlayerStore";
+import { AutoAdvanceSpeeds, advancerStore } from "../../state/AdvancerStore";
 
 
 // tracesPerFrame: min 200, good 400, max 2000
@@ -12,6 +13,11 @@ export const RENDERING_SMOOTHNESS_TRACES_FACTOR = 10;
 
 export class AutoAdvancer {
   constructor(private readonly player: Player) {
+    listen("auto-advance-mode-changed", () => {
+      if (advancerStore.isAutoAdvanceMode && playerStore.isPaused) {
+        this.player.endPause(PauseEndReason.AUTO_ADVANCE_ENABLED);
+      }
+    });
   }
 
   setAutoAdvanceSpeed(speed: AutoAdvanceSpeeds, renderingSmoothness: number) {
@@ -20,11 +26,5 @@ export class AutoAdvancer {
     particleEngineStore.maxTracesPerFrame = MAX_TRACES_PER_FRAME[speed] * (renderingSmoothness > 1 ? renderingSmoothness * RENDERING_SMOOTHNESS_TRACES_FACTOR : 1);
     particleEngineStore.maxTotalTraces = MAX_TOTAL_TRACES_PER_FRAME[speed] * (renderingSmoothness > 1 ? renderingSmoothness * RENDERING_SMOOTHNESS_TRACES_FACTOR : 1);
     particleEngineStore.currentMaxTotalTraces = MAX_TOTAL_TRACES_PER_FRAME[speed] * (renderingSmoothness > 1 ? renderingSmoothness * RENDERING_SMOOTHNESS_TRACES_FACTOR : 1);
-  }
-  toggleAutoAdvanceMode() {
-    advancerStore.isAutoAdvanceMode = !advancerStore.isAutoAdvanceMode;
-    if (advancerStore.isAutoAdvanceMode && playerStore.isPaused) {
-      this.player.endPause(PauseEndReason.AUTO_ADVANCE_ENABLED);
-    }
   }
 }

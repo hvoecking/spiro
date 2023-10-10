@@ -5,7 +5,9 @@
 import Alpine from "alpinejs";
 import { getXComponents, registerXComponent } from "../../../src/components/XComponent";
 
-window.Alpine = Alpine;
+type AlpineWindow = Window & typeof globalThis & { Alpine: typeof Alpine };
+
+(window as AlpineWindow).Alpine = Alpine;
 
 // Define the mount function, add options = {} as second argument if needed
 export const mount = (component) => {

@@ -1,6 +1,6 @@
 import { dispatch } from "../../Utilities";
 import FpsStatus from "./FpsStatus";
-import { performanceStore } from "./PerformanceStore";
+import { performanceStore } from "../../state/PerformanceStore";
 
 // Possible target FPS values
 const POSSIBLE_TARGET_FPS = [30, 60, 120];

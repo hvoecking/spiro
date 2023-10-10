@@ -1,11 +1,11 @@
 import Alpine, { AlpineComponent } from "alpinejs";
 
-import { CanvasStore } from "./Canvas";
 import { MnemonicsStore, mnemonicsStore } from "./Mnemonics";
 
 import { Buffer } from "buffer";
 (globalThis as unknown as { Buffer: typeof Buffer }).Buffer = Buffer;  // For bip39
 import * as bip39 from "bip39";
+import { resetHandler } from "../services/reset/ResetHandler";
 
 export type Seed = string[];
 
@@ -39,7 +39,7 @@ const _seedStore = {
   setSeed(seed: Seed, immediateFeedback: boolean) {
     this.seed = seed;
     afterInit(() => seedModel && seedModel.$dispatch("update-seed"));
-    (Alpine.store("canvas") as CanvasStore).requestReset(immediateFeedback);
+    resetHandler.requestReset(immediateFeedback);
   },
 };
 Alpine.store("seed", _seedStore);
