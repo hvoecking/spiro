@@ -1,0 +1,60 @@
+<template x-component="developer-modal">
+  <div
+    x-data="{ ...developerModalComponent(), ...$el.parentElement.data(), config: config }"
+  >
+    <div
+      @escape.window="$store.developerConfig.isOpen = false"
+      x-show="$store.developerConfig.isOpen"
+      x-transition:enter="transition ease-in duration-300"
+      x-transition:enter-start="opacity-0 scale-110 blur"
+      x-transition:enter-end="opacity-100 scale-100"
+      x-transition:leave="transition ease-out duration-300"
+      x-transition:leave-start="opacity-100 scale-100"
+      x-transition:leave-end="opacity-0 scale-110 blur"
+      class="
+        fixed top-1/2 left-1/2 z-30 -translate-x-1/2 -translate-y-1/2
+        flex items-center justify-center
+        p-2
+        bg-black
+      "
+      data-test-id="about"
+    >
+      <div class="bg-black bg-opacity-50 rounded-lg p-4 w-96 text-white">
+        <h4 class="text-2xl font-semibold mb-4">Developer Config</h4>
+
+        <p class="text-base mb-4 text-justify text-sm">
+          <template
+            x-for="(entry, index) in Object.entries(config)"
+            :key="index"
+          >
+            <div class="mb-2 flex justify-between">
+              <label :for="entry[0]" class="block text-sm font-medium text-white" x-text="entry[0]"></label>
+              <input
+                :type="{boolean: 'checkbox', number: 'number', string: 'text'}[typeof entry[1]]"
+                :name="entry[0]"
+                :id="entry[0]"
+                :value="entry[1]"
+                @input="config[entry[0]] = {boolean: $event.target.checked, number: $event.target.valueAsNumber, string: $event.target.value}[typeof entry[1]]"
+                class="mt-1 text-right px-1 block rounded-md bg-gray-100 text-black border-transparent focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+          </template>
+        </p>
+
+        <button
+          @click="$store.developerConfig.isOpen = false"
+          class="absolute top-0 right-2 m-2 text-white transition hover:text-gray-400"
+        >
+          ×
+        </button>
+
+        <button
+          @click="setHashParams(); location.reload()"
+          class="bg-blue-500 text-white py-1 px-2 rounded"
+        >
+          Reload with new config
+        </button>
+      </div>
+    </div>
+  </div>
+</template>

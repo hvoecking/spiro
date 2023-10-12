@@ -1,0 +1,21 @@
+<template x-component="spiro-animation">
+  <div
+    x-data="{ ...spiroAnimationComponent(), ...$el.parentElement.data() }"
+  >
+    <div
+      x-show="!wasTriggered"
+      x-transition:leave="transition-all ease-in duration-700 transform"
+      x-transition:leave-start="opacity-100 scale-100 tracking-wider"
+      x-transition:leave-end="opacity-0 scale-150"
+      x-ref="spiroAnimation"
+      class="
+        absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50
+        font-sans font-thin text-6xl tracking-wider
+        text-white
+        transform
+      "
+    >
+      SPIRO
+    </div>
+  </div>
+</template>

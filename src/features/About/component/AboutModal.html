@@ -1,0 +1,66 @@
+<template x-component="about-modal">
+  <div
+    x-data="{ ...aboutModalComponent(), ...$el.parentElement.data() }"
+  >
+    <div
+      @escape.window="$store.about.isOpen = false"
+      x-show="$store.about.isOpen"
+      x-transition:enter="transition ease-in duration-300"
+      x-transition:enter-start="opacity-0 blur"
+      x-transition:enter-end="opacity-100"
+      x-transition:leave="transition ease-out duration-300"
+      x-transition:leave-start="opacity-100"
+      x-transition:leave-end="opacity-0 blur"
+      class="
+        fixed top-1/2 left-1/2 z-30 -translate-x-1/2 -translate-y-1/2
+        w-96 h-60
+        rounded-lg
+        backdrop-blur-lg
+      "
+    ></div>
+    <div
+      @escape.window="$store.about.isOpen = false"
+      x-show="$store.about.isOpen"
+      x-transition:enter="transition ease-in duration-300"
+      x-transition:enter-start="opacity-0 scale-110 blur"
+      x-transition:enter-end="opacity-100 scale-100"
+      x-transition:leave="transition ease-out duration-300"
+      x-transition:leave-start="opacity-100 scale-100"
+      x-transition:leave-end="opacity-0 scale-110 blur"
+      class="
+        fixed top-1/2 left-1/2 z-30 -translate-x-1/2 -translate-y-1/2
+        flex items-center justify-center
+        p-2
+        bg-transparent
+      "
+      data-test-id="about"
+    >
+      <div class="bg-black bg-opacity-50 rounded-lg p-4 w-96 h-60 text-white">
+        <h4
+          @click="handleDevModeClick()"
+          class="text-2xl font-semibold mb-4 cursor-pointer"
+          x-text="`Spiro v${config.appVersion}`"
+        ></h4>
+
+        <p class="text-base mb-4 text-justify text-sm">
+          <strong>Spiro</strong> is a digital art tool that visualizes a particle's chaotic orbit around a black hole. Save, load, and share your patterns using a 128-bit, BIP39 mnemonic seed using the share button in the lower right corner.
+        </p>
+
+        <p class="text-sm">
+          <a href="https://github.com/hvoecking/spiro" class="text-blue-400 hover:underline">Learn More on GitHub</a>
+        </p>
+
+        <p class="text-xs mt-4 text-red-400">
+          <strong>Note:</strong> Spiro seeds are not Bitcoin seeds. Do not use your Bitcoin seed here.
+        </p>
+
+        <button
+          @click="$store.about.isOpen = false"
+          class="absolute top-0 right-2 m-2 text-white transition hover:text-gray-400"
+        >
+          ×
+        </button>
+      </div>
+    </div>
+  </div>
+</template>

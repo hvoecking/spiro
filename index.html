@@ -1,54 +1,49 @@
 <!doctype html>
-<html lang="en" x-data="globalSettings()" :class="{ 'invert': !isDarkMode }">
+<html
+  lang="en"
+  x-data="documentComponent()"
+  style="background-color: #000; /* can't use bg-black as this needs to be applied when page reloads immediatley */"
+  :class="{ 'invert': !$store.darkMode.isDarkMode }"
+>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>sprio</title>
+    <title>SPIRO</title>
     <style>
       /* Can't be in styles.css because it needs to be loaded before page is rendered */
       [x-cloak] {
         display: none;
       }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        position: relative;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        margin: 0;
+      }
     </style>
   </head>
   <body
     :class="{
-      'cursor-none': !isActive && $store.canvas.isFullScreen(),
+      'cursor-none': !$store.inactivityTracker.isActive && fullScreenHandler.isFullScreen(),
     }"
     x-cloak
-    x-data="initAlpine()"
     class="
       absolute top-0 left-0 w-full h-full
       overflow-hidden
     "
   >
-    <div
-      x-show="!initAnimationTriggered"
-      x-transition:leave="transition-all ease-in duration-700 transform"
-      x-transition:leave-start="opacity-100 scale-100 tracking-wider"
-      x-transition:leave-end="opacity-0 scale-150"
-      x-ref="initAnimation"
-      class="
-        absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50
-        font-sans font-thin text-6xl tracking-wider
-        text-white
-        transform
-      "
-    >
-      SPIRO
-    </div>
-    <canvas
-      @click="$dispatch('escape'); player.togglePause()"
-      x-data="canvasComponent()"
-      @pause-changed.window="pauseChanged()"
-      x-ref="canvas"
-      class="
-        absolute w-full h-full left-0 top-0 z-0
-        m-0 p-0
-      "
-      style="background-color: #000; /* Needed to get color from style in code */"
-      data-test-id="canvas"
-    ></canvas>
+    <x-inactivity-tracker></x-inactivity-tracker>
+
+    <x-particle-engine-canvas></x-particle-engine-canvas>
+
+    <x-spiro-animation></x-spiro-animation>
+
+    <x-toast-rack></x-toast-rack>
 
     <x-performance-display></x-performance-display>
 
@@ -99,15 +94,15 @@
             <p>Settings</p>
             <span
               :class="{
-                '-left-full': !initAnimationStarted,
-                'opacity-0': !isActive,
-                'opacity-80 hover:opacity-100': isActive && !$store.sideMenu.isOpen,
-                'relative': !($store.sideMenu.isOpen && initAnimationStarted),
-                'translate-x-12': !$store.sideMenu.isOpen && initAnimationStarted,
+                '-left-full': !$store.spiroAnimation.hasStarted,
+                'opacity-0': !$store.inactivityTracker.isActive,
+                'opacity-80 hover:opacity-100': $store.inactivityTracker.isActive && !$store.sideMenu.isOpen,
+                'relative': !($store.sideMenu.isOpen && $store.spiroAnimation.hasStarted),
+                'translate-x-12': !$store.sideMenu.isOpen && $store.spiroAnimation.hasStarted,
                 'translate-x-1 rotate-180': $store.sideMenu.isOpen,
               }"
               class="
-                transition-transform
+                transition-all
                 pr-4
                 origin-left
                 text-xl font-bold
@@ -126,18 +121,18 @@
               bg-gray-700 text-white hover:bg-gray-600
               cursor-pointer
             "
-            @click="$store.canvas.toggleFullScreen()"
+            @click="fullScreenHandler.toggleFullScreen()"
           >
             <div>
               <p>Full Screen</p>
             </div>
             <div
               :class="{
-                '-left-full': !initAnimationStarted,
-                'opacity-0': !isActive,
-                'opacity-80 hover:opacity-100': isActive && !$store.sideMenu.isOpen,
-                'relative': !($store.sideMenu.isOpen && initAnimationStarted),
-                'translate-x-16': (!$store.sideMenu.isOpen && initAnimationStarted),
+                '-left-full': !$store.spiroAnimation.hasStarted,
+                'opacity-0': !$store.inactivityTracker.isActive,
+                'opacity-80 hover:opacity-100': $store.inactivityTracker.isActive && !$store.sideMenu.isOpen,
+                'relative': !($store.sideMenu.isOpen && $store.spiroAnimation.hasStarted),
+                'translate-x-16': (!$store.sideMenu.isOpen && $store.spiroAnimation.hasStarted),
               }"
               class="
                 inline-block
@@ -149,24 +144,11 @@
                 slide-in
               "
             >
-              <div class="full-screen-icon translate-x-2 w-6 h-6"></div>
+              <x-full-screen-button class="translate-x-2"></x-full-screen-button>
             </div>
           </div>
 
-          <x-toggle-switch
-            :data-hint="'Switch to ' + (isDarkMode ? 'light' : 'dark') + ' mode'"
-            data-breakout
-            data-icon-left="is-dark-mode-false-icon"
-            data-icon-right="is-dark-mode-true-icon"
-            data-id="darkModeToggle"
-            data-label="Dark Mode"
-            data-model="isDarkMode"
-            x-data="{
-              click: () => toggleDarkMode(),
-              model: isDarkMode,
-            }"
-          >
-          </x-toggle-switch>
+          <x-dark-mode-toggle-switch></x-dark-mode-toggle-switch>
 
           <x-toggle-switch
             :data-hint="'Switch to ' + ($store.shapes.isShapesMode ? 'shapes' : 'circles') + ' mode'"
@@ -177,7 +159,7 @@
             data-label="Spiro Type"
             data-model="$store.shapes.isShapesMode"
             x-data="{
-              click: () => toggleShapesMode(),
+              click: () => $store.shapes.toggleShapesMode(),
               model: $store.shapes.isShapesMode,
             }"
           >
@@ -301,13 +283,13 @@
               >
               </x-toggle-switch>
               <x-toggle-switch
-                :data-hint="'Switch to ' + ($store.canvas.isRenderVelocity ? 'not' : '') + ' rendering velocity'"
+                :data-hint="'Switch to ' + ($store.renderSmoothness.isRenderVelocity ? 'not' : '') + ' rendering velocity'"
                 data-id="velocityModeToggle"
                 data-label="Velocity"
-                data-model="$store.canvas.isRenderVelocity"
+                data-model="$store.renderSmoothness.isRenderVelocity"
                 x-data="{
-                  click: () => $store.canvas.isRenderVelocity = !$store.canvas.isRenderVelocity,
-                  model: $store.canvas.isRenderVelocity,
+                  click: () => $store.renderSmoothness.toggleRenderVelocityMode(),
+                  model: $store.renderSmoothness.isRenderVelocity,
                 }"
               >
               </x-toggle-switch>
@@ -321,14 +303,14 @@
                 "
               >
                 <div>Rendering Smoothness</div>
-                <input class="w-full" type="range" min="1" max="10" step="0.1" :value="$store.canvas.renderingSmoothness**2" @input="$store.canvas.setRenderingSmoothness(Math.sqrt($event.target.valueAsNumber))">
+                <input class="w-full" type="range" min="1" max="10" step="0.1" :value="$store.renderSmoothness.renderingSmoothness**2" @input="$store.renderSmoothness.setRenderingSmoothness(Math.sqrt($event.target.valueAsNumber))">
               </div>
             </div>
           </div>
         </div>
 
         <div
-          @click="$store.about.open = !$store.about.open"
+          @click="$store.about.isOpen = !$store.about.isOpen"
           class="flex items-center justify-between p-2 bg-gray-700 text-white hover:bg-gray-600 cursor-pointer"
         >
           <p>About</p>
@@ -345,68 +327,11 @@
       </div>
     </div>
 
-    <!-- About Modal -->
-    <div
-      @escape.window="$store.about.open = false"
-      x-show="$store.about.open"
-      x-transition:enter="transition ease-in duration-300"
-      x-transition:enter-start="opacity-0 blur"
-      x-transition:enter-end="opacity-100"
-      x-transition:leave="transition ease-out duration-300"
-      x-transition:leave-start="opacity-100"
-      x-transition:leave-end="opacity-0 blur"
-      class="
-        fixed top-1/2 left-1/2 z-30 -translate-x-1/2 -translate-y-1/2
-        w-96 h-60
-        rounded-lg
-        backdrop-blur-lg
-      "
-    ></div>
-    <div
-      @escape.window="$store.about.open = false"
-      x-show="$store.about.open"
-      x-transition:enter="transition ease-in duration-300"
-      x-transition:enter-start="opacity-0 scale-110 blur"
-      x-transition:enter-end="opacity-100 scale-100"
-      x-transition:leave="transition ease-out duration-300"
-      x-transition:leave-start="opacity-100 scale-100"
-      x-transition:leave-end="opacity-0 scale-110 blur"
-      class="
-        fixed top-1/2 left-1/2 z-30 -translate-x-1/2 -translate-y-1/2
-        flex items-center justify-center
-        p-2
-        bg-transparent
-      "
-      data-test-id="about"
-    >
-      <div class="bg-black bg-opacity-50 rounded-lg p-4 w-96 h-60 text-white">
-        <h4 class="text-2xl font-semibold mb-4">About Spiro</h4>
-
-        <p class="text-base mb-4 text-justify text-sm">
-          <strong>Spiro</strong> is a digital art tool that visualizes a particle's chaotic orbit around a black hole. Save, load, and share your patterns using a 128-bit, BIP39 mnemonic seed using the share button in the lower right corner.
-        </p>
-
-        <p class="text-sm">
-          <a href="https://github.com/hvoecking/spiro" class="text-blue-400 hover:underline">Learn More on GitHub</a>
-        </p>
-
-        <p class="text-xs mt-4 text-red-400">
-          <strong>Note:</strong> Spiro seeds are not Bitcoin seeds. Do not use your Bitcoin seed here.
-        </p>
-
-        <button
-          @click="$store.about.open = false"
-          class="absolute top-0 right-2 m-2 text-white transition hover:text-gray-400"
-        >
-          ×
-        </button>
-      </div>
-    </div>
     <div
       :class="{
-        'opacity-0': !isActive,
-        'opacity-100': isActive,
-        'translate-x-full': !initAnimationStarted,
+        'opacity-0': !$store.inactivityTracker.isActive,
+        'opacity-100': $store.inactivityTracker.isActive,
+        '-translate-y-full': !$store.spiroAnimation.hasStarted,
       }"
       class="
         absolute top-0 right-0 z-10
@@ -415,8 +340,8 @@
       "
     >
       <div
-        @click="$store.about.open = !$store.about.open"
-        x-show="!$store.performance.isOpen && !$store.about.open"
+        @click="$store.about.isOpen = !$store.about.isOpen"
+        x-show="!$store.performance.isOpen && !$store.about.isOpen"
         class="
           w-4 h-4
           opacity-80 hover:opacity-100
@@ -426,124 +351,42 @@
       ></div>
     </div>
 
-    <div
-      x-data="seedComponent()"
-      @escape.window="$store.seed.isOpen = false"
-      style="font-size: 0.42em"
-      class="
-        -translate-x-1/2
-        absolute
-        backdrop-blur-sm
-        border
-        bottom-0
-        duration-300
-        ease-in-out
-        font-mono
-        left-1/2
-        p-2
-        rounded
-        text-white
-        transition
-        z-30
-      "
-      init="init"
-      @update-seed="updateFromStore()"
+    <x-about-modal></x-about-modal>
+    <x-developer-modal></x-developer-modal>
+
+    <x-seed-menu></x-seed-menu>
+
+    <x-player-interface
       :class="{
-        'translate-y-full': !$store.seed.isOpen,
-      }"
-      data-test-id="seed"
-    >
-      <div class="flex overflow-x-auto" id="seedConfig">
-        <!-- Dynamically generated -->
-      </div>
-      <input class="w-full" type="range" min="0" :max="Number.MAX_SAFE_INTEGER" step="1" x-model="numericSeed" @input="updateFromNumericSeed($event.target.value)">
-      <div class="justify-between">
-        <button :disabled="!isMnemonicValid" @click="updateFromMnemonic()" class="bg-blue-700 text-white py-1 px-2 rounded disabled:opacity-50 disabled:cursor-not-allowed">Apply Mnemonic</button>
-        <input class="bg-transparent" id="mnemonic" type="text" x-model="mnemonic" x-bind:style="{ 'width': `${mnemonic.length + 1}ch` }" @input="checkMnemonic()">
-        <button @click="saveAndClose()" class="bg-blue-500 text-white py-1 px-2 rounded fixed right-2">Save</button>
-      </div>
-    </div>
-    <div
-      :class="{
-        'opacity-0': !isActive,
-        'opacity-100': isActive,
-        'translate-y-full bottom-0': !initAnimationStarted,
-        'bottom-0': initAnimationStarted,
+        'translate-y-28': !$store.spiroAnimation.hasStarted,
+        'opacity-0': !$store.inactivityTracker.isActive || $store.seed.isOpen,
+        'opacity-100': $store.inactivityTracker.isActive && !$store.seed.isOpen,
       }"
       class="
-        absolute left-0 z-10
-        p-3
-        transition duration-200 ease-in slide-in
+        absolute bottom-0 left-1/2 z-10
+        -translate-x-1/2 mb-20
+        transition duration-200 ease-in
+        slide-in
       "
     >
-      <div
-        @click="$store.seed.isOpen = !$store.seed.isOpen"
-        x-data="{ innerWidth: window.innerWidth }"
-        x-init="() => {
-          window.addEventListener('resize', () => {
-            innerWidth = window.innerWidth;
-          });
-        }"
-        x-show="innerWidth > 860"
-        class="
-          w-4 h-4
-          opacity-80 hover:opacity-100
-          cursor-pointer eject-icon
-        "
-        data-test-id="eject"
-      ></div>
-    </div>
+    </x-player-interface>
+    <x-player-ghost-image-animation
+      :class="{
+        'translate-y-28': !$store.spiroAnimation.hasStarted,
+      }"
+      class="
+        absolute bottom-0 left-1/2 z-10
+        -translate-x-1/2 mb-20
+        transition duration-200 ease-in
+        slide-in
+      "
+    >
+    </x-player-ghost-image-animation>
 
     <div
       :class="{
-        'translate-y-28': !initAnimationStarted,
-      }"
-      class="
-        absolute bottom-0 left-1/2 z-10
-        -translate-x-1/2 mb-20
-        transition duration-200 ease-in
-        slide-in
-      "
-      x-data="ghostImageComponent()"
-      @pause-changed.window="triggerGhostImage()"
-    >
-      <!-- Floating Video Player Overlay -->
-      <div class="flex flex-col items-center justify-center p-0 bg-transparent">
-        <!-- Video Controls -->
-        <div class="flex items-center space-x-20 text-white">
-          <!-- Ghost Image Animation -->
-          <div
-            x-show="showGhostImage"
-            x-transition:leave="transition duration-500 ease-in-out opacity-0 scale-[2.5]"
-            :class="{
-              'play-icon': $store.player.isPaused,
-              'pause-icon': !$store.player.isPaused,
-            }"
-            class="cursor-pointer w-8 h-8"
-          >
-          </div>
-        </div>
-      </div>
-    </div>
-    <div
-      :class="{
-        'translate-y-28': !initAnimationStarted,
-        'opacity-0': !isActive || $store.seed.isOpen,
-        'opacity-100': isActive && !$store.seed.isOpen,
-      }"
-      class="
-        absolute bottom-0 left-1/2 z-10
-        -translate-x-1/2 mb-20
-        transition duration-200 ease-in
-        slide-in
-      "
-    >
-      <x-player-interface></x-player-interface>
-    </div>
-    <div
-      :class="{
-        'translate-y-full': !initAnimationStarted,
-        'opacity-0': !isActive || $store.seed.isOpen,
+        'translate-y-full': !$store.spiroAnimation.hasStarted,
+        'opacity-0': !$store.inactivityTracker.isActive || $store.seed.isOpen,
       }"
       class="
         slide-in
@@ -564,9 +407,9 @@
       x-data="{ zoomActive: false }"
       @zoom-changed.window="zoomActive = true; setTimeout(() => { zoomActive = false }, 2000)"
       :class="{
-        'opacity-0': !isActive && !zoomActive,
-        'translate-x-full': !initAnimationStarted,
-        'translate-x-1/2': initAnimationStarted,
+        'opacity-0': !$store.inactivityTracker.isActive && !zoomActive,
+        'translate-x-full': !$store.spiroAnimation.hasStarted,
+        'translate-x-1/2': $store.spiroAnimation.hasStarted,
       }"
       class="
         absolute top-1/2 right-0
@@ -582,8 +425,8 @@
 
     <x-share-button
       :class="{
-        'opacity-0': !isActive,
-        'translate-x-full': !initAnimationStarted,
+        'opacity-0': !$store.inactivityTracker.isActive,
+        'translate-x-full': !$store.spiroAnimation.hasStarted,
       }"
       class="
         absolute bottom-0 right-0 z-10

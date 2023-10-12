@@ -1,0 +1,18 @@
+<template x-component="particle-engine-canvas">
+  <div
+    x-data="{ ...particleEngineCanvasComponent(), ...$el.parentElement.data() }"
+  >
+    <canvas
+      @click="$dispatch('escape'); player.togglePause()"
+      @dblclick="fullScreenHandler.toggleFullScreen()"
+      @pause-changed.window="pauseChanged()"
+      x-ref="canvas"
+      class="
+        absolute w-full h-full left-0 top-0 z-0
+        m-0 p-0
+      "
+      style="background-color: #000; /* Needed to get color from style in code */"
+      data-test-id="canvas"
+    ></canvas>
+  </div>
+</template>
