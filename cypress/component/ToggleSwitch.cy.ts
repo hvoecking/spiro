@@ -1,7 +1,7 @@
 import Alpine from "alpinejs";
 import "cypress-real-events";
 
-import { toggleSwitch } from "../../src/components/ToggleSwitch/ToggleSwitch";
+import { toggleSwitch } from "../../src/lib/components/ToggleSwitch/ToggleSwitch";
 
 Alpine.store("toggleSwitch", {
   isRight: false,

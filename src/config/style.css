@@ -1,0 +1,33 @@
+@import "normalize.css";
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+/* @import 'tailwindcss/colors'; */
+@import "/build/icons/icons.css";
+
+.slider-thumb::-webkit-slider-thumb {
+  width: 0.5rem;
+  height: 0.5rem;
+  background: #ffffff;
+  opacity: 0.5;
+  cursor: pointer;
+  appearance: none;
+  border-radius: 999px;
+  transition: opacity 0.3s ease;
+}
+.slider-thumb::-webkit-slider-thumb:hover {
+  opacity: 1;
+}
+.slider-thumb::-moz-range-thumb {
+    width: 0.5rem;
+    height: 0.5rem;
+    background: #ffffff;
+    opacity: 0.5;
+    cursor: pointer;
+    appearance: none;
+    border-radius: 999px;
+    transition: opacity 0.3s ease;
+}
+.slider-thumb::-moz-range-thumb:hover {
+  opacity: 1;
+}

@@ -1,0 +1,29 @@
+<template x-component="player-ghost-image-animation">
+  <div
+    x-data="{ ...playerGhostImageAnimationComponent(), ...$el.parentElement.data() }"
+    @pause-changed.window="triggerGhostImage()"
+  >
+    <!-- Floating Video Player Overlay -->
+    <div class="flex flex-col items-center justify-center p-0 bg-transparent">
+      <!-- Video Controls -->
+      <div class="flex items-center space-x-20 text-white">
+        <!-- Ghost Image Animation -->
+        <div
+          x-show="showGhostImage"
+          x-transition:leave="transition duration-500 ease-in-out opacity-0"
+          class="backdrop-blur-lg bg-black w-8 h-8"
+        >
+          <div
+            x-show="showGhostImage"
+            x-transition:leave="transition duration-500 ease-in-out opacity-0 scale-[2.5]"
+            :class="{
+              'play-icon': !$store.player.isPaused,
+              'pause-icon': $store.player.isPaused,
+            }"
+            class="cursor-pointer w-8 h-8"
+          ></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>

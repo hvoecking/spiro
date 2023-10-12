@@ -1,7 +1,6 @@
 import Alpine from "alpinejs";
 import "cypress-real-events";
-
-import { shareButton } from "./../../src/components/ShareButton/ShareButton";
+import { shareButton } from "../../src/lib/components/ShareButton/ShareButton";
 
 Alpine.data("shareButtonComponent", shareButton.alpineComponent);
 

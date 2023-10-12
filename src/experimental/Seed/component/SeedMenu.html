@@ -1,0 +1,68 @@
+<template x-component="seed-menu">
+  <div
+    x-data="{ ...seedMenuComponent(), ...$el.parentElement.data() }"
+    @escape.window="$store.seed.isOpen = false"
+    style="font-size: 0.42em"
+    class="
+      -translate-x-1/2
+      absolute
+      backdrop-blur-sm
+      border
+      bottom-0
+      duration-100
+      ease-in-out
+      font-mono
+      left-1/2
+      p-2
+      rounded
+      text-white
+      transition
+      z-30
+    "
+    init="init"
+    @update-seed.window="updateFromStore()"
+    :class="{
+      'translate-y-full': !$store.seed.isOpen,
+    }"
+    data-test-id="seed"
+  >
+    <div class="flex overflow-x-auto" id="seedConfig">
+      <!-- Dynamically generated -->
+    </div>
+    <input class="w-full" type="range" min="0" :max="Number.MAX_SAFE_INTEGER" step="1" x-model="numericSeed" @input="updateFromNumericSeed($event.target.value)">
+    <div class="justify-between">
+      <button :disabled="!isMnemonicValid" @click="updateFromMnemonic()" class="bg-blue-700 text-white py-1 px-2 rounded disabled:opacity-50 disabled:cursor-not-allowed">Apply Mnemonic</button>
+      <input class="bg-transparent" id="mnemonic" type="text" x-model="mnemonic" x-bind:style="{ 'width': `${mnemonic.length + 1}ch` }" @input="checkMnemonic()">
+      <button @click="saveAndClose()" class="bg-blue-500 text-white py-1 px-2 rounded fixed right-2">Save</button>
+    </div>
+  </div>
+  <div
+    :class="{
+      'opacity-0': !$store.inactivityTracker.isActive,
+      'opacity-100': $store.inactivityTracker.isActive,
+      'translate-y-full': !$store.spiroAnimation.hasStarted,
+    }"
+    class="
+      absolute left-0 bottom-0 z-10
+      p-3
+      transition duration-200 ease-in slide-in
+    "
+  >
+    <div
+      @click="$store.seed.isOpen = !$store.seed.isOpen"
+      x-data="{ innerWidth: window.innerWidth }"
+      x-init="() => {
+        window.addEventListener('resize', () => {
+          innerWidth = window.innerWidth;
+        });
+      }"
+      x-show="innerWidth > 860"
+      class="
+        w-4 h-4
+        opacity-80 hover:opacity-100
+        cursor-pointer eject-icon
+      "
+      data-test-id="eject"
+    ></div>
+  </div>
+</template>

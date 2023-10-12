@@ -1,203 +1,88 @@
-import "./style.css";
-import Alpine, { AlpineComponent } from "alpinejs";
+import "./config/style.css";
+import Alpine from "alpinejs";
 
-import { canvasFactory } from "./components/Canvas";
-import { seedComponent } from "./components/Seed";
-import { mnemonicsComponent } from "./components/Mnemonics";
-import { addAlpineToWindow, isDevMode, isTestMode } from "./Utilities";
-import { shareButton } from "./components/ShareButton/ShareButton";
-import { performanceDisplay } from "./components/PerformanceDisplay/PerformanceDisplay";
-import { toggleSwitch } from "./components/ToggleSwitch/ToggleSwitch";
-import { getXComponents, registerXComponent } from "./components/XComponent";
-import { FpsManager } from "./services/FpsManager/FpsManager";
-import { playerInterfaceFactory } from "./components/PlayerInterface/PlayerInterface";
-import { Player } from "./services/Player/Player";
-import { playerStore } from "./state/PlayerStore";
-import { AutoAdvancer } from "./services/AutoAdvancer/Advancer";
-import { advanceSpeedSelectorFactory } from "./components/AdvancerInterface/AdvanceSpeedSelector";
-import { ParticleEngine } from "./services/ParticleEngine/ParticleEngine";
-import { StateHandler } from "./services/State/CalculationHandler";
-import { zoomSliderFactory } from "./components/ZoomSlider/ZoomSlider";
+import { addAlpineToWindow } from "./lib/Alpine";
+import { performanceDisplayFactory } from "./features/Performance/component/PerformanceDisplay";
+import { addComponent, getXComponents, registerXComponent } from "./lib/XComponent";
+import { FpsManager } from "./features/Performance/service/FpsManager";
+import { playerInterfaceFactory } from "./features/Player/component/PlayerInterface";
+import { Player } from "./features/Player/service/Player";
+import { advanceSpeedSelectorFactory } from "./features/AutoAdvancer/component/AdvanceSpeedSelector";
+import { ParticleEngine } from "./features/ParticleEngine/service/ParticleEngine";
+import { CalculationState } from "./features/ParticleEngine/state/CalculationState";
+import { zoomSliderFactory } from "./features/Zoom/component/ZoomSlider";
+import { fullScreenButtonFactory } from "./features/FullScreen/component/FullScreenButton";
+import { fullScreenHandler } from "./features/FullScreen/service/FullScreenHandler";
+import { AutoAdvancer } from "./features/AutoAdvancer/service/Advancer";
+import { shareButtonFactory } from "./lib/components/ShareButton/ShareButton";
+import { toggleSwitchFactory } from "./lib/components/ToggleSwitch/ToggleSwitch";
+import { config } from "./config/config";
+import { seedMenuFactory } from "./experimental/Seed/component/SeedMenu";
+import { dispatch } from "./lib/Event";
+import { particleEngineCanvasFactory } from "./features/ParticleEngine/component/ParticleEngineCanvas";
+import { playerGhostImageAnimationFactory } from "./features/Player/component/PlayerGhostImageAnimation";
+import { aboutModalFactory } from "./features/About/component/AboutModal";
+import { aboutStore } from "./features/About/state/AboutStore";
+import { inactivityTrackerFactory } from "./features/InactivityTracker/component/InactivityTracker";
+import { darkModeStore } from "./features/DarkMode/state/PlayerStore";
+import { darkModeToggleSwitchFactory } from "./features/DarkMode/component/DarkModeToggleSwitch";
+import { spiroAnimationFactory } from "./features/SpiroAnimation/component/SpiroAnimation";
+import { toastRackFactory } from "./features/Toaster/component/ToastRack";
+import { developerModalFactory } from "./features/DeveloperConfig/component/DeveloperModal";
 
-addAlpineToWindow();
+if (config.appMode !== "production") {
+  console.warn("config:", config);
+  // TOOD: Remove these as soon as stores are used somewhere
+  console.warn(aboutStore.isOpen);
+  console.warn(darkModeStore.isDarkMode);
+}
 
 const player = new Player();
 const fpsManager = new FpsManager();
 const advancer = new AutoAdvancer(player);
-const stateHandler = new StateHandler(ParticleEngine.calculateTracesFunction);
+const stateHandler = new CalculationState(ParticleEngine.calculateTracesFunction);
 const particleEngine = new ParticleEngine(stateHandler);
 
-Alpine.data("performanceDisplayComponent", performanceDisplay.alpineComponent);
-Alpine.data("shareButtonComponent", shareButton.alpineComponent);
-Alpine.data("toggleSwitchComponent", toggleSwitch.alpineComponent);
-Alpine.data("playerInterfaceComponent", playerInterfaceFactory(player).alpineComponent);
-Alpine.data("zoomSliderComponent", zoomSliderFactory().alpineComponent);
-Alpine.data("advanceSpeedSelectorComponent", advanceSpeedSelectorFactory(advancer).alpineComponent);
+addAlpineToWindow();
 
-function ghostImageComponent() {
+addComponent(aboutModalFactory());
+addComponent(advanceSpeedSelectorFactory(advancer));
+addComponent(darkModeToggleSwitchFactory());
+addComponent(developerModalFactory());
+addComponent(fullScreenButtonFactory());
+addComponent(inactivityTrackerFactory());
+addComponent(particleEngineCanvasFactory(fpsManager, player, particleEngine));
+addComponent(performanceDisplayFactory());
+addComponent(playerGhostImageAnimationFactory());
+addComponent(playerInterfaceFactory(player));
+if (config.enableSeedComponent) {
+  addComponent(seedMenuFactory());
+}
+addComponent(shareButtonFactory());
+addComponent(spiroAnimationFactory());
+addComponent(toastRackFactory());
+addComponent(toggleSwitchFactory());
+addComponent(zoomSliderFactory());
+
+Alpine.data("documentComponent", () => {
   return {
-    showGhostImage: false,
-    triggerGhostImage() {
-      this.showGhostImage = true;
-      setTimeout(() => {
-        this.showGhostImage = false;
-      }, 100);
-    }
-  };
-}
-
-Alpine.data("ghostImageComponent", ghostImageComponent);
-Alpine.data("canvasComponent", canvasFactory(
-  fpsManager,
-  player,
-  particleEngine,
-));
-Alpine.data("globalSettings", globalSettings);
-Alpine.data("initAlpine", initAlpine);
-Alpine.data("mnemonicsComponent", mnemonicsComponent);
-Alpine.data("seedComponent", seedComponent);
-
-export interface SideMenuStore {
-  isOpen: boolean;
-  toggle(): void;
-  close(): void;
-}
-Alpine.store("sideMenu", {
-  isOpen: false,
-  isAdvancedMenuOpen: isDevMode(),
-  isExperimentalMenuOpen: isDevMode(),
-});
-// about component
-Alpine.store("about", {
-  isOpen: false,
-});
-Alpine.start();
-
-interface GlobalSettings {
-  isDarkMode: boolean;
-  toggleDarkMode(): void;
-  lastActivityTime: number;
-  isActive: boolean;
-  checkActivity(): void;
-  reportActivity(): void;
-  initAnimationStarted: boolean;
-  init(): void;
-}
-
-let wakeLock: WakeLockSentinel | null = null;
-const requestWakeLock = async () => {
-  try {
-    wakeLock = await navigator.wakeLock.request("screen");
-    wakeLock.addEventListener("release", () => {
-    });
-  } catch (e: unknown) {
-    const err = e as Error;
-    console.error(`Could not obtain wake lock: ${err.name}, ${err.message}`);
-  }
-};
-
-// Function to release the wake lock
-const releaseWakeLock = () => {
-  if (wakeLock !== null) {
-    wakeLock.release();
-    wakeLock = null;
-  }
-};
-
-export function globalSettings(this: GlobalSettings) {
-  const INACTIVITY_TIMEOUT = 2000;
-  return {
-    isDarkMode: window.matchMedia("(prefers-color-scheme: dark)").matches,
-    toggleDarkMode() {
-      this.isDarkMode = !this.isDarkMode;
-    },
-
-    lastActivityTime: Date.now(),
-    isActive: true,
-    checkActivity() {
-      const wasActive = Date.now() - this.lastActivityTime < INACTIVITY_TIMEOUT;
-      const isOpen = (Alpine.store("sideMenu") as SideMenuStore).isOpen;
-      this.isActive = wasActive || isOpen || playerStore.isPaused || isTestMode();
-      if (this.isActive) {
-        releaseWakeLock();
-      } else {
-        requestWakeLock();
-      }
-    },
-
-    reportActivity() {
-      this.lastActivityTime = Date.now();
-      this.checkActivity();
-    },
-
-    initAnimationStarted: false,
+    config,
+    fullScreenHandler,
 
     init() {
-      // The init animation starts at 500ms and takes another 700ms to complete. The
-      // slide-in animation takes 300ms. We want a delay that makes both to end at the
-      // same time.
-      const delay = 500 + 700 - 300;
-      setTimeout(() => this.initAnimationStarted = true, delay);
-
-      // Consider these events as activity
-      document.addEventListener("mousemove", () => {
-        this.reportActivity();
-      });
-      // document.addEventListener("keydown", () => {
-      //  this.reportActivity();
-      // });
-      document.addEventListener("click", () => {
-        this.reportActivity();
-      });
-
-      // Kick off the activity check
-      const checkActivity = () => this.checkActivity();
-      function activityLoop() {
-        setTimeout(() => {
-          checkActivity();
-          activityLoop();
-        }, INACTIVITY_TIMEOUT);
-      }
-      activityLoop();
-    },
-  };
-}
-
-interface InitAlpineComponent extends AlpineComponent<Record<string | symbol, unknown>> {
-  initAnimationTriggered: boolean;
-  $refs: {
-    canvas: HTMLElement;
-    chevron: HTMLElement;
-    sideMenu: HTMLElement;
-    initAnimation: HTMLElement;
-  };
-  init(): void;
-  $dispatch(event: string): void;
-}
-
-export function initAlpine(this: InitAlpineComponent): InitAlpineComponent {
-  return {
-    initAnimationTriggered: false,
-
-    init() {
-      setTimeout(() => {
-        this.initAnimationTriggered = true;
-        const spacing = Math.min(50, window.innerWidth / 2 / "SPIRO".length);
-        this.$refs.initAnimation.style.setProperty("letter-spacing", `var(--tracking, ${spacing}px)`);
-      }, 500);
-
       window.addEventListener("touchmove", preventDefault, { passive: false });
       function preventDefault(e: TouchEvent) {
         e.preventDefault();
       }
-      document.addEventListener("keydown", ev => ev.key === "Escape" && this.$dispatch("escape"));
+      document.addEventListener("keydown", ev => ev.key === "Escape" && dispatch("escape"));
     },
-  } as InitAlpineComponent;
-}
+  };
+});
+
+Alpine.start();
 
 document.addEventListener("DOMContentLoaded", () => {
   getXComponents().forEach(c => registerXComponent(c));
-  Alpine.nextTick(() => console.warn("VITE_APP_MODE:", import.meta.env.VITE_APP_MODE));
 });
 
 document.addEventListener("shutdown", () => {

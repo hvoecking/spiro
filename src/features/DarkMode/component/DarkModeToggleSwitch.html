@@ -1,0 +1,20 @@
+<template x-component="dark-mode-toggle-switch">
+  <div
+    x-data="{ ...darkModeToggleSwitchComponent(), ...$el.parentElement.data() }"
+  >
+    <x-toggle-switch
+      :data-hint="'Switch to ' + ($store.darkMode.isDarkMode ? 'light' : 'dark') + ' mode'"
+      data-breakout
+      data-icon-left="is-dark-mode-false-icon"
+      data-icon-right="is-dark-mode-true-icon"
+      data-id="darkModeToggle"
+      data-label="Dark Mode"
+      data-model="$store.darkMode.isDarkMode"
+      x-data="{
+        click: () => $store.darkMode.toggleDarkMode(),
+        model: $store.darkMode.isDarkMode,
+      }"
+    >
+    </x-toggle-switch>
+  </div>
+</template>

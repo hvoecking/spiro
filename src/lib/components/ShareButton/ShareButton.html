@@ -1,0 +1,17 @@
+<template x-component="share-button">
+  <div
+    x-data="{ ...shareButtonComponent(), ...$el.parentElement.data() }"
+    class="p-3 grid justify-items-end"
+  >
+    <div
+      @click="copyURL()"
+      class="
+        w-4 h-4
+        opacity-80 hover:opacity-100
+        cursor-pointer share-icon
+        text-white
+      "
+      x-bind:data-test-id="get('id') + '-icon'"
+    ></div>
+  </div>
+</template>

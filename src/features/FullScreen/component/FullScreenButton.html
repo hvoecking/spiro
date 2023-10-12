@@ -1,0 +1,8 @@
+<template x-component="full-screen-button">
+  <div
+    x-data="{ ...fullScreenButtonComponent(), ...$el.parentElement.data() }"
+    class="p-3 grid justify-items-end"
+  >
+    <div class="w-6 h-6" :class="{ 'is-full-screen-true-icon': isFullScreen, 'is-full-screen-false-icon': !isFullScreen }"></div>
+  </div>
+</template>

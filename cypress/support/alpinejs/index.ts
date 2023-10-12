@@ -3,7 +3,7 @@
 
 // Import Alpine.js if needed
 import Alpine from "alpinejs";
-import { getXComponents, registerXComponent } from "../../../src/components/XComponent";
+import { getXComponents, registerXComponent } from "../../../src/lib/XComponent";
 
 type AlpineWindow = Window & typeof globalThis & { Alpine: typeof Alpine };
 

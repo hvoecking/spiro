@@ -1,0 +1,51 @@
+
+<!-- TODO: Remove all the magic of breakout, isActive, and initAnimation behavior -->
+<!-- TODO: Use proper event handling instead of (model ? '' : '') -->
+
+<template x-component="toggle-switch">
+  <div
+    x-data="{ ...toggleSwitchComponent(), ...$el.parentElement.data() }"
+  >
+    <div class="p-2 text-white bg-gray-700 flex items-center justify-between">
+      <div>
+        <p x-text="get('label')"></p>
+        <p class="text-zinc-400 text-[11px]" x-text="(model ? '' : '') + get('hint')"></p>
+      </div>
+      <div :class="{ 'opacity-0': !$store.inactivityTracker.isActive && !$store.sideMenu.isOpen, 'opacity-80 hover:opacity-100': $store.inactivityTracker.isActive && !$store.sideMenu.isOpen, '-left-full slide-in': get('breakout') }" class="transition-all duration-200 ease-in">
+        <div
+          :class="{
+            '-left-full': get('breakout') && !$store.spiroAnimation.hasStarted,
+            'translate-x-[4.25rem]': get('breakout') && (!$store.sideMenu.isOpen && $store.spiroAnimation.hasStarted),
+            'slide-in': get('breakout'),
+          }"
+          class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in overflow-visible"
+        >
+          <input
+            :id="get('id')"
+            :name="get('id')"
+            @click="click()"
+            class="toggle-checkbox hidden"
+            type="checkbox"
+            x-bind:data-test-id="get('id')"
+            x-init="$watch(get('model'), value => model = value)"
+            x-model="model"
+          >
+          <label
+            :class="{
+              'bg-transparent border color-black': !$store.sideMenu.isOpen,
+              'bg-gray-600': $store.sideMenu.isOpen,
+            }"
+            :for="get('id')" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-600 cursor-pointer duration-200 ease-in transition-full">
+            <span class="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition" :class="{'translate-x-4': model}">
+              <div
+                :class="{[get('iconLeft')]: !model, [get('iconRight')]: model}"
+                class="text-black text-[11px] flex items-center justify-center w-2 h-2 m-1"
+                x-text="model ? (get('textRight') ? get('textRight') : '') : (get('textLeft') ? get('textLeft') : '')"
+              ></div>
+            </span>
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
