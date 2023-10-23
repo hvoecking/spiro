@@ -5,7 +5,7 @@ import { Seed, seedStore } from "./Seed/state/SeedStore";
 import { mnemonicFromSeed, seedFromMnemonic } from "./Seed/component/SeedMenu";
 import { getBareHashParam, setBareHashParam } from "../lib/UrlHashParams";
 
-const _mnemonicsStore = {
+const _store = {
   mnemonics: [] as string[],
   currentIdx: -1,
 
@@ -61,10 +61,6 @@ const _mnemonicsStore = {
     return isMnemonicValid;
   },
 };
-Alpine.store("mnemonics", _mnemonicsStore);
+Alpine.store("mnemonics", _store);
 
-export const mnemonicsStore = Alpine.store("mnemonics") as typeof _mnemonicsStore;
-
-export function mnemonicsComponent() {
-  return {};
-}
+export const mnemonicsStore = Alpine.store("mnemonics") as typeof _store;

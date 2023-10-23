@@ -1,5 +1,4 @@
 import Alpine from "alpinejs";
-import "cypress-real-events";
 
 import { playerInterfaceFactory } from "../../src/features/Player/component/PlayerInterface";
 import { Player } from "../../src/features/Player/service/Player";

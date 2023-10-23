@@ -6,7 +6,7 @@ import { advancerStore } from "../../AutoAdvancer/state/AdvancerStore";
 import { zoomStore } from "../../Zoom/state/ZoomStore";
 
 export function performanceDisplayFactory() {
-  function performanceDisplayComponent() {
+  function component() {
     return {
       calculationTime: "",
       elapsedSeconds: "",
@@ -21,9 +21,9 @@ export function performanceDisplayFactory() {
       update() {
         this.frameCount = `${(performanceStore.currentFpsCount < 10 ? "0" : "")}${performanceStore.currentFpsCount}`;
         this.fps = String(performanceStore.currentFps);
-        this.maxTracesPerFrame = particleEngineStore.maxTracesPerFrame.toFixed(0);
-        this.calculationTime = performanceStore.calculationTime.toFixed(2);
-        this.renderTime = performanceStore.renderTime.toFixed(2);
+        this.maxTracesPerFrame = particleEngineStore.maxTracesPerFrame ? particleEngineStore.maxTracesPerFrame.toFixed(0) : "-1";
+        this.calculationTime = (performanceStore.calculationTimeTracker.getAverage() * 1000).toFixed(0);
+        this.renderTime = (performanceStore.renderTimeTracker.getAverage() * 1000).toFixed(0);
         if (particleEngineStore.totalTraces) {
           this.totalTraces = (particleEngineStore.totalTraces / particleEngineStore.maxTotalTraces * 100).toFixed(0);
           this.maxTotalTraces = (particleEngineStore.maxTotalTraces/1000).toFixed(0);
@@ -36,8 +36,8 @@ export function performanceDisplayFactory() {
           this.totalTracesPerSecond = "";
         }
         this.zoom = (zoomStore.zoom * 100).toFixed();
-      }
+      },
     };
   }
-  return new XComponent(template, "performance-display", performanceDisplayComponent);
+  return new XComponent(template, "performance-display", component);
 }

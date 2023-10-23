@@ -3,7 +3,7 @@ import { XComponent } from "../../../lib/XComponent";
 import { zoomStore } from "../state/ZoomStore";
 
 export function zoomSliderFactory() {
-  function zoomSliderComponent() {
+  function component() {
     return {
       init() {
         // Listen for "wheel" event on the document
@@ -16,5 +16,5 @@ export function zoomSliderFactory() {
       },
     };
   }
-  return new XComponent(template, "zoom-slider", zoomSliderComponent);
+  return new XComponent(template, "zoom-slider", component);
 }

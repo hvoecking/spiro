@@ -28,7 +28,7 @@ const releaseWakeLock = () => {
 };
 
 export function inactivityTrackerFactory() {
-  function inactivityTrackerComponent() {
+  function component() {
     return {
       lastActivityTime: Date.now(),
       checkActivity() {
@@ -72,5 +72,5 @@ export function inactivityTrackerFactory() {
       },
     };
   }
-  return new XComponent(template, "inactivity-tracker", inactivityTrackerComponent);
+  return new XComponent(template, "inactivity-tracker", component);
 }

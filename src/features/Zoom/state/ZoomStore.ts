@@ -3,7 +3,7 @@ import { clamp } from "../../../lib/Math";
 import { dispatch } from "../../../lib/Event";
 import { resetHandler } from "../../../core/services/ResetHandler";
 
-const _zoomStore = {
+const _store = {
   zoom: 0.75,
   setZoom(zoom: number) {
     dispatch("zoom-changed");
@@ -12,6 +12,6 @@ const _zoomStore = {
   },
 };
 
-Alpine.store("zoom", _zoomStore);
+Alpine.store("zoom", _store);
 
-export const zoomStore: typeof _zoomStore = Alpine.store("zoom") as typeof _zoomStore;
+export const zoomStore = Alpine.store("zoom") as typeof _store;

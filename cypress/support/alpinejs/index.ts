@@ -5,12 +5,10 @@
 import Alpine from "alpinejs";
 import { getXComponents, registerXComponent } from "../../../src/lib/XComponent";
 
-type AlpineWindow = Window & typeof globalThis & { Alpine: typeof Alpine };
-
-(window as AlpineWindow).Alpine = Alpine;
+addAlpineToWindow();
 
 // Define the mount function, add options = {} as second argument if needed
-export const mount = (component) => {
+export const mount = (component: string) => {
   // Create a div element to host the Alpine.js component
   const div = document.createElement("div");
 
@@ -28,3 +26,6 @@ export const mount = (component) => {
   // Return the mounted component for further testing
   return cy.wrap(div);
 };
+function addAlpineToWindow() {
+  throw new Error("Function not implemented.");
+}

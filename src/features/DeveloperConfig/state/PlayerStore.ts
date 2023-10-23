@@ -1,9 +1,9 @@
 import Alpine from "alpinejs";
 
-const _developerConfigStore = {
+const _store = {
   isOpen: false,
 };
 
-Alpine.store("developerConfig", _developerConfigStore);
+Alpine.store("developerConfig", _store);
 
-export const developerConfigStore: typeof _developerConfigStore = Alpine.store("developerConfig") as typeof _developerConfigStore;
+export const developerConfigStore = Alpine.store("developerConfig") as typeof _store;

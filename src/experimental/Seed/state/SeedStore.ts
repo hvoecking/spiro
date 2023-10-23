@@ -4,7 +4,7 @@ import { resetHandler } from "../../../core/services/ResetHandler";
 
 export type Seed = string[];
 
-const _seedStore = {
+const _store = {
   isOpen: false,
   seed: [] as Seed,
   setSeed(seed: Seed, immediateFeedback: boolean) {
@@ -15,6 +15,6 @@ const _seedStore = {
     });
   },
 };
-Alpine.store("seed", _seedStore);
+Alpine.store("seed", _store);
 
-export const seedStore = Alpine.store("seed") as typeof _seedStore;
+export const seedStore = Alpine.store("seed") as typeof _store;

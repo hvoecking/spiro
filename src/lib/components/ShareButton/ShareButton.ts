@@ -1,19 +1,17 @@
-import { toasterStore } from "../../../features/Toaster/state/ToasterStore";
+import { Toaster } from "../../../features/Toaster/service/Toaster";
 import { XComponent } from "../../XComponent";
 import template from "./ShareButton.html?raw";
 
 export function shareButtonFactory() {
-  function shareButtonComponent() {
+  function component() {
     return {
-      copied: false,
-      copyURL: async function() {
+      toaster: new Toaster(),
+      copyUrl: async function() {
         await navigator.clipboard.writeText(window.location.href);
-        this.copied = true;
-        setTimeout(() => this.copied = false, 3000);
-        toasterStore.createToast("Link copied to clipboard", "success");
+        this.toaster.createToast("Link copied to clipboard", "success");
       },
     };
   }
 
-  return new XComponent(template, "share-button", shareButtonComponent);
+  return new XComponent(template, "share-button", component);
 }

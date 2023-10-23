@@ -10,6 +10,7 @@
       "node": true
     },
     "rules": {
+      "comma-dangle": ["error", "always-multiline"],
       "@typescript-eslint/explicit-module-boundary-types": "off",
       "no-console": ["error", { "allow": ["warn", "error"] }],
       "semi": ["error", "always"],

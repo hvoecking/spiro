@@ -1,14 +1,13 @@
 import { particleEngineStore } from "../state/ParticleEngineStore";
-import { AsParticle, AsTraces, CalculationState } from "../state/CalculationState";
+import { AsParticle, CalculationState } from "../state/CalculationState";
 import { Point } from "../../../lib/Point";
 import { resetHandler } from "../../../core/services/ResetHandler";
 import { shapesStore } from "../../Shapes/state/ShapsStore";
+import { AsTraces } from "./AsTraces";
 
 export class ParticleEngine {
   numTracesPerFrame: number = 0;
   multiplier: number = 0;
-  // @Gettable
-  // totalTraces: number = 0;
   frameCount = 0;
 
   constructor(private readonly stateHandler: CalculationState) {
@@ -22,7 +21,7 @@ export class ParticleEngine {
     }
     if (this.frameCount === 0) {
       if (particleEngineStore.immediateFeedback) {
-        return 2**12;
+        return 2**14;
       }
     }
     this.numTracesPerFrame = Math.min(

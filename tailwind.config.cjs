@@ -4,6 +4,7 @@ export default {
     "./index.html",
     "./html/**/*.html",
     "./src/**/*.{vue,js,ts,jsx,tsx,html}",
+    "./assets/icons/*.svg",
     "./test/**/*.{vue,js,ts,jsx,tsx,html}",
   ],
   theme: {

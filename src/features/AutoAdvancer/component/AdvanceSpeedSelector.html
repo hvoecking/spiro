@@ -22,7 +22,7 @@
           min="0"
           step="1"
           type="range"
-          @input="advancer.setAutoAdvanceSpeed(speeds[$event.target.valueAsNumber], $store.canvas.renderingSmoothness); $store.advancer.isAutoAdvanceMode = true"
+          @input="advancer.setAutoAdvanceSpeed(speeds[$event.target.valueAsNumber], $store.renderQuality.quality); $store.advancer.isAutoAdvanceMode = true"
         />
 
         <!-- Icons -->
@@ -32,7 +32,7 @@
               class="w-5 h-5 cursor-pointer"
               :data-test-id="'speed-' + speed + '-icon'"
               :class="'speed-' + speed + '-icon ' + ($store.advancer.autoAdvanceSpeed === speed && $store.advancer.isAutoAdvanceMode ? 'opacity-100': 'opacity-50')"
-              @click="advancer.setAutoAdvanceSpeed(index, $store.canvas.renderingSmoothness); $store.advancer.isAutoAdvanceMode = true"
+              @click="advancer.setAutoAdvanceSpeed(index, $store.renderQuality.quality); $store.advancer.isAutoAdvanceMode = true"
             ></div>
           </template>
         </div>

@@ -1,6 +1,4 @@
-import Alpine from "alpinejs";
-
-import { MnemonicsStore } from "../../../experimental/Mnemonics";
+import { mnemonicsStore } from "../../../experimental/Mnemonics";
 import { playerStore } from "../state/PlayerStore";
 import { dispatch } from "../../../lib/Event";
 import { advancerStore } from "../../AutoAdvancer/state/AdvancerStore";
@@ -27,11 +25,11 @@ export class Player {
   }
 
   previous() {
-    (Alpine.store("mnemonics") as MnemonicsStore).previousMnemonic();
+    mnemonicsStore.previousMnemonic();
   }
 
   next() {
-    (Alpine.store("mnemonics") as MnemonicsStore).nextMnemonic();
+    mnemonicsStore.nextMnemonic();
   }
 
   togglePause() {
@@ -58,7 +56,7 @@ export class Player {
 
     if (this.pauseStartReason === PauseStartReason.MAX_TRACES_DRAWN) {
       if (pauseEndReason === PauseEndReason.AUTO_ADVANCE_ENABLED) {
-        (Alpine.store("mnemonics") as MnemonicsStore).nextMnemonic();
+        mnemonicsStore.nextMnemonic();
         this.unpause();
       } else if (pauseEndReason === PauseEndReason.PLAY_PAUSE_BUTTON_CLICKED) {
         particleEngineStore.currentMaxTotalTraces = Infinity;
