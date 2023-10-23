@@ -1,7 +1,7 @@
 import Alpine from "alpinejs";
 import { resetHandler } from "../../../core/services/ResetHandler";
 
-const _shapesStore = {
+const _store = {
   isShapesMode: false,
   toggleShapesMode() {
     this.isShapesMode = !this.isShapesMode;
@@ -9,6 +9,6 @@ const _shapesStore = {
   },
 };
 
-Alpine.store("shapes", _shapesStore);
+Alpine.store("shapes", _store);
 
-export const shapesStore: typeof _shapesStore = Alpine.store("shapes") as typeof _shapesStore;
+export const shapesStore: typeof _store = Alpine.store("shapes") as typeof _store;

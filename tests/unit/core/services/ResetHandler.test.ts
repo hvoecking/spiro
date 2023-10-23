@@ -1,5 +1,5 @@
-import { Point } from "../../../src/lib/Point";
-import { ResetHandler } from "../../../src/core/services/ResetHandler";
+import { Point } from "../../../../src/lib/Point";
+import { ResetHandler } from "../../../../src/core/services/ResetHandler";
 
 
 describe("ResetHandler", () => {

@@ -1,9 +1,9 @@
 import Alpine from "alpinejs";
 
-const _aboutStore = {
+const _store = {
   isOpen: false,
 };
 
-Alpine.store("about", _aboutStore);
+Alpine.store("about", _store);
 
-export const aboutStore: typeof _aboutStore = Alpine.store("about") as typeof _aboutStore;
+export const aboutStore = Alpine.store("about") as typeof _store;

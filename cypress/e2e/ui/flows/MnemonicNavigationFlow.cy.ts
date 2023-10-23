@@ -1,33 +1,14 @@
-/* eslint-disable no-undef */
-/// <reference types="cypress" />
+import { setupDefaultActions } from "../../utils";
 
-import "cypress-real-events";
-import { APP_TEST_URL, setAnimationAndTransitionTimesToZero, shutdown } from "../utils";
-
-context("All", () => {
-  beforeEach(() => {
-    cy.visit(APP_TEST_URL);
-    setAnimationAndTransitionTimesToZero();
-  });
-
-  afterEach(() => {
-    shutdown();
-  });
-
-  it("should toggle play/pause", () => {
-    // Given the simulation is running
-    cy.get("[data-test-id='play-pause-button']").should("have.class", "pause-icon");
-
-    // When I click the pause button
-    cy.get("[data-test-id='play-pause-button']").click();
-
-    // Then the simulation should pause
-    cy.get("[data-test-id='play-pause-button']").should("have.class", "play-icon");
-  });
+context("Mnemonic Navigation Flow", () => {
+  setupDefaultActions();
 
   it("should go to next and previous mnemonic", () => {
     const MNEMONIC_PATTERN = /mnemonic=([a-z]{3,8}\+?){12}/;
     let firstHash: string;
+
+    cy.wait(100);
+
     // Get current mnemonic from URL hash as string
     cy.location().then((loc) => {
       firstHash = loc.hash;

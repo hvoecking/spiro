@@ -1,9 +1,9 @@
 import Alpine from "alpinejs";
 
-const _inactivityTrackerStore = {
+const _store = {
   isActive: true,
 };
 
-Alpine.store("inactivityTracker", _inactivityTrackerStore);
+Alpine.store("inactivityTracker", _store);
 
-export const inactivityTrackerStore: typeof _inactivityTrackerStore = Alpine.store("inactivityTracker") as typeof _inactivityTrackerStore;
+export const inactivityTrackerStore = Alpine.store("inactivityTracker") as typeof _store;

@@ -2,7 +2,7 @@ import template from "./PlayerGhostImageAnimation.html?raw";
 import { XComponent } from "../../../lib/XComponent";
 
 export function playerGhostImageAnimationFactory() {
-  function playerGhostImageAnimationComponent() {
+  function component() {
     return {
       showGhostImage: false,
       triggerGhostImage() {
@@ -10,8 +10,8 @@ export function playerGhostImageAnimationFactory() {
         setTimeout(() => {
           this.showGhostImage = false;
         }, 100);
-      }
+      },
     };
   }
-  return new XComponent(template, "player-ghost-image-animation", playerGhostImageAnimationComponent);
+  return new XComponent(template, "player-ghost-image-animation", component);
 }

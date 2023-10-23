@@ -1,18 +1,7 @@
-/* eslint-disable no-undef */
-/// <reference types="cypress" />
+import { setupDefaultActions } from "../../utils";
 
-import "cypress-real-events";
-import { APP_TEST_URL, setAnimationAndTransitionTimesToZero, shutdown } from "../utils";
-
-context("PerformanceDisplay", () => {
-  beforeEach(() => {
-    cy.visit(APP_TEST_URL);
-    setAnimationAndTransitionTimesToZero();
-  });
-
-  afterEach(() => {
-    shutdown();
-  });
+context("PerformanceDisplay Feature", () => {
+  setupDefaultActions();
 
   it("should show performance display on fps toggle switch", () => {
     // Given the auto advance mode is on

@@ -18,7 +18,7 @@ export const AUTO_ADVANCE_DELAY = {
 };
 
 
-const _advancerStore = {
+const _store = {
   speeds: Object.values(AutoAdvanceSpeeds),
   autoAdvanceSpeed: INITIAL_AUTO_ADVANCE_SPEED,
   isAutoAdvanceMode: config.defaultIsAutoAdvanceMode,
@@ -34,7 +34,7 @@ const _advancerStore = {
   },
 };
 
-Alpine.store("advancer", _advancerStore);
+Alpine.store("advancer", _store);
 
-export const advancerStore: typeof _advancerStore = Alpine.store("advancer") as typeof _advancerStore;
+export const advancerStore = Alpine.store("advancer") as typeof _store;
 resetHandler.registerListener(() => advancerStore.reset());

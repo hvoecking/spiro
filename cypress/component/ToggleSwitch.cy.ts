@@ -1,7 +1,6 @@
 import Alpine from "alpinejs";
-import "cypress-real-events";
 
-import { toggleSwitch } from "../../src/lib/components/ToggleSwitch/ToggleSwitch";
+import { toggleSwitchFactory } from "../../src/lib/components/ToggleSwitch/ToggleSwitch";
 
 Alpine.store("toggleSwitch", {
   isRight: false,
@@ -9,7 +8,7 @@ Alpine.store("toggleSwitch", {
 Alpine.store("sideMenu", {
   isOpen: true,
 });
-Alpine.data("toggleSwitchComponent", toggleSwitch.alpineComponent);
+Alpine.data("toggleSwitchComponent", toggleSwitchFactory().alpineComponent);
 
 it("should display toggle switch", () => {
   cy.mount(`

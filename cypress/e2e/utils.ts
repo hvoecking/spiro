@@ -21,3 +21,14 @@ export function shutdown() {
     doc.dispatchEvent(new Event("shutdown"));
   });
 }
+
+export function setupDefaultActions() {
+  beforeEach(() => {
+    cy.visit(APP_TEST_URL);
+    setAnimationAndTransitionTimesToZero();
+  });
+
+  afterEach(() => {
+    shutdown();
+  });
+}

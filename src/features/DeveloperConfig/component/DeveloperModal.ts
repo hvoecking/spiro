@@ -5,7 +5,6 @@ import { setTypedHashParam } from "../../../lib/UrlHashParams";
 
 export function developerModalFactory() {
   function component() {
-    console.warn("entries:", Object.entries(config));
     return {
       config,
       setHashParams() {

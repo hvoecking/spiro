@@ -1,9 +1,9 @@
 import Alpine from "alpinejs";
 
-const _spiroAnimationStore = {
+const _store = {
   hasStarted: false,
 };
 
-Alpine.store("spiroAnimation", _spiroAnimationStore);
+Alpine.store("spiroAnimation", _store);
 
-export const spiroAnimationStore: typeof _spiroAnimationStore = Alpine.store("spiroAnimation") as typeof _spiroAnimationStore;
+export const spiroAnimationStore = Alpine.store("spiroAnimation") as typeof _store;

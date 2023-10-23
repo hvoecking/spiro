@@ -1,29 +1,37 @@
-
 export const PHYSICAL_MAX_TRACES_PER_FRAME = 340000;
 export const PARTICLE_STATE_SIZE = 9;
 export const TRACES_SIZE = PHYSICAL_MAX_TRACES_PER_FRAME * 3;
 
 import { Point } from "../../../lib/Point";
+import { AsTraces } from "../service/AsTraces";
 import init from "./../../../../build/release.wasm?init";
 import { calculationStateStore } from "./CalculationStore";
 
 // Create a WebAssembly Memory instance. This part should match your AssemblyScript's
 // @memory decorator or the default settings if you didn't specify any.
-const PAGES = (TRACES_SIZE + PARTICLE_STATE_SIZE) / 64 * 4;
+const PAGES = ((TRACES_SIZE + PARTICLE_STATE_SIZE) / 64) * 4;
 
-function newWasmF64Array(module: WebAssembly.Instance, memory: WebAssembly.Memory, size: number) {
+function newWasmF64Array(
+  module: WebAssembly.Instance,
+  memory: WebAssembly.Memory,
+  size: number
+) {
   return new Float64Array(
     memory.buffer,
     (module.exports.newFloat64Array as CallableFunction)(size),
-    size,
+    size
   );
 }
 
-function newWasmF32Array(module: WebAssembly.Instance, memory: WebAssembly.Memory, size: number) {
+function newWasmF32Array(
+  module: WebAssembly.Instance,
+  memory: WebAssembly.Memory,
+  size: number
+) {
   return new Float32Array(
     memory.buffer,
     (module.exports.newFloat32Array as CallableFunction)(size),
-    size,
+    size
   );
 }
 
@@ -63,32 +71,6 @@ export class AsParticle {
   }
 }
 
-export class AsTraces {
-  getItensity(i: number) {
-    return this.get(i)[2];
-  }
-  constructor(private readonly traces: Float64Array | Float32Array) {
-  }
-
-  store(i: number, position_x: number, position_y: number, intensity: number): void {
-    this.traces[i * 3] = position_x;
-    this.traces[i * 3 + 1] = position_y;
-    this.traces[i * 3 + 2] = intensity;
-  }
-
-  get(i: number): [number, number, number] {
-    return [
-      this.traces[i * 3],
-      this.traces[i * 3 + 1],
-      this.traces[i * 3 + 2],
-    ];
-  }
-
-  length(): number {
-    return this.traces.length / 3;
-  }
-}
-
 interface State {
   traces: Float64Array | Float32Array;
   particleState: Float64Array | Float32Array;
@@ -124,8 +106,6 @@ class JsF32State implements State {
   public particleState = new Float32Array(PARTICLE_STATE_SIZE);
 }
 
-
-
 export class CalculationState {
   private wasmF64State: WasmF64State | null = null;
   private wasmF32State: WasmF32State | null = null;
@@ -135,14 +115,20 @@ export class CalculationState {
   public tracesF64: Float64Array | null = null;
   public tracesF32: Float32Array | null = null;
   public traces: Float64Array | Float32Array | null = null;
-  private wasmCalculateTraces: CallableFunction | null = null;
+  private wasmCalculateTracesF32: CallableFunction | null = null;
+  private wasmCalculateTracesF64: CallableFunction | null = null;
 
   constructor(private readonly jsCalculateTraces: CallableFunction) {
     this.setupWasm();
   }
 
   getState(): State {
-    if (calculationStateStore.isWasmMode && calculationStateStore.isWasmModuleLoaded && this.wasmF64State && this.wasmF32State) {
+    if (
+      calculationStateStore.isWasmMode &&
+      calculationStateStore.isWasmModuleLoaded &&
+      this.wasmF64State &&
+      this.wasmF32State
+    ) {
       if (calculationStateStore.isHighPrecisionMode) {
         return this.wasmF64State;
       } else {
@@ -156,13 +142,10 @@ export class CalculationState {
     }
   }
 
-  calculateTraces(
-    width: number,
-    height: number,
-    maxTraces: number,
-  ): number {
-    if (calculationStateStore.isWasmModuleLoaded && this.wasmCalculateTraces) {
-      return this.wasmCalculateTraces(
+  calculateTraces(width: number, height: number, maxTraces: number): number {
+    if (calculationStateStore.isWasmMode && calculationStateStore.isWasmModuleLoaded && this.wasmCalculateTracesF32 && this.wasmCalculateTracesF64) {
+      const wasmCalculateTraces = calculationStateStore.isHighPrecisionMode ? this.wasmCalculateTracesF64 : this.wasmCalculateTracesF32;
+      return wasmCalculateTraces(
         width,
         height,
         this.getState().particleState,
@@ -175,7 +158,7 @@ export class CalculationState {
         height,
         new AsParticle(this.getState().particleState),
         new AsTraces(this.getState().traces),
-        maxTraces,
+        maxTraces
       );
     }
   }
@@ -185,7 +168,7 @@ export class CalculationState {
     velocity: Point,
     gravity: number,
     add: Point,
-    mul: Point,
+    mul: Point
   ) {
     const state = this.getState();
     state.traces.fill(0);
@@ -225,9 +208,10 @@ export class CalculationState {
 
   populateStates(instance: WebAssembly.Instance, memory: WebAssembly.Memory) {
     calculationStateStore.isWasmModuleLoaded = true;
-    this.wasmF64State = new WasmF64State(instance, memory);
     this.wasmF32State = new WasmF32State(instance, memory);
-    this.wasmCalculateTraces = instance.exports.calcNumTraces as CallableFunction;
+    this.wasmF64State = new WasmF64State(instance, memory);
+    this.wasmCalculateTracesF32 = instance.exports.calculateTracesF32 as CallableFunction;
+    this.wasmCalculateTracesF64 = instance.exports.calculateTracesF64 as CallableFunction;
   }
 
   abortHandler(_msg: string, _file: string, line: number, column: number) {

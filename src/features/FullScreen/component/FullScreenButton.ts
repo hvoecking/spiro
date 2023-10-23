@@ -3,7 +3,7 @@ import { XComponent } from "../../../lib/XComponent";
 import { fullScreenHandler } from "../service/FullScreenHandler";
 
 export function fullScreenButtonFactory() {
-  function fullScreenButtonComponent() {
+  function component() {
     return {
       isFullScreen: false,
       init() {
@@ -24,8 +24,8 @@ export function fullScreenButtonFactory() {
         document.addEventListener("fullscreenchange", () => {
           this.isFullScreen = fullScreenHandler.isFullScreen();
         });
-      }
+      },
     };
   }
-  return new XComponent(template, "full-screen-button", fullScreenButtonComponent);
+  return new XComponent(template, "full-screen-button", component);
 }

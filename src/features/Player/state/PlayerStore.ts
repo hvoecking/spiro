@@ -1,9 +1,9 @@
 import Alpine from "alpinejs";
 
-const _playerStore = {
+const _store = {
   isPaused: false,
 };
 
-Alpine.store("player", _playerStore);
+Alpine.store("player", _store);
 
-export const playerStore: typeof _playerStore = Alpine.store("player") as typeof _playerStore;
+export const playerStore: typeof _store = Alpine.store("player") as typeof _store;
