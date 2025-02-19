@@ -2,7 +2,11 @@ import { listen } from "../../../lib/Event";
 import { playerStore } from "../../Player/state/PlayerStore";
 import { AutoAdvanceSpeeds, advancerStore } from "../state/AdvancerStore";
 import { PauseEndReason, Player } from "../../Player/service/Player";
-import { adjustedMaxTotalTraces, adjustedMaxTracesPerFrame, particleEngineStore } from "../../ParticleEngine/state/ParticleEngineStore";
+import {
+  adjustedMaxTotalTraces,
+  adjustedMaxTracesPerFrame,
+  particleEngineStore,
+} from "../../ParticleEngine/state/ParticleEngineStore";
 
 export class AutoAdvancer {
   constructor(private readonly player: Player) {

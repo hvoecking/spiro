@@ -12,9 +12,7 @@ export const config = {
 
   appVersion: import.meta.env.VITE_APP_VERSION,
 
-  autoAdvanceDelaySeconds: parseFloat(
-    import.meta.env.VITE_AUTO_ADVANCE_DELAY_SECONDS,
-  ),
+  autoAdvanceDelaySeconds: parseFloat(import.meta.env.VITE_AUTO_ADVANCE_DELAY_SECONDS),
 
   checkActivity: parseBoolean(import.meta.env.VITE_CHECK_ACTIVITY),
 
@@ -34,9 +32,7 @@ export const config = {
     import.meta.env.VITE_DEFAULT_IS_PERFORMANCE_DISPLAY_OPEN,
   ),
 
-  resetOnWindowResize: parseBoolean(
-    import.meta.env.VITE_RESET_ON_WINDOW_RESIZE,
-  ),
+  resetOnWindowResize: parseBoolean(import.meta.env.VITE_RESET_ON_WINDOW_RESIZE),
 
   enableSeedComponent: parseBoolean(import.meta.env.VITE_ENABLE_SEED_COMPONENT),
 
@@ -54,7 +50,7 @@ Object.entries(config).forEach(([key, originalValue]) => {
 const toaster = new Toaster();
 let errorToastIndex: number | null = null;
 
-window.addEventListener("error", event => {
+window.addEventListener("error", (event) => {
   // Create a toast for the error
   if (!config.toastOnError) return;
   if (errorToastIndex !== null && toaster.isToastVisible(errorToastIndex)) return;

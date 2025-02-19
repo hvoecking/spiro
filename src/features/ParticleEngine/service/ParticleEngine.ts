@@ -21,7 +21,7 @@ export class ParticleEngine {
     }
     if (this.frameCount === 0) {
       if (particleEngineStore.immediateFeedback) {
-        return 2**14;
+        return 2 ** 14;
       }
     }
     this.numTracesPerFrame = Math.min(
@@ -31,7 +31,12 @@ export class ParticleEngine {
     return this.numTracesPerFrame;
   }
 
-  calculateTraces(width: number, height: number, maxTracesPerFrame: number, maxTotalTraces: number): AsTraces | null {
+  calculateTraces(
+    width: number,
+    height: number,
+    maxTracesPerFrame: number,
+    maxTotalTraces: number,
+  ): AsTraces | null {
     if (this.frameCount === 15 && particleEngineStore.immediateFeedback) {
       return null;
     }
@@ -42,22 +47,38 @@ export class ParticleEngine {
     return new AsTraces(this.stateHandler.getState().traces.slice(0, tracesDrawn * 3));
   }
 
-  static calculateTracesFunction(width: number, height: number, particle: AsParticle, traces: AsTraces, numTraces: number) {
+  static calculateTracesFunction(
+    width: number,
+    height: number,
+    particle: AsParticle,
+    traces: AsTraces,
+    numTraces: number,
+  ) {
     let tracesDrawn = 0;
     const centerX = width / 2;
     const centerY = height / 2;
     for (let i = 0; i < Math.max(200, 10 * numTraces); i++) {
       const dx = particle.p_x - centerX;
       const dy = particle.p_y - centerY;
-      const dist = Math.sqrt(dx*dx + dy*dy);
-      const gd = (-particle.gravity / dist);
-      particle.v_x += dx / gd * particle.mul_x + particle.add_x;
-      particle.v_y += dy / gd * particle.mul_y + particle.add_y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      const gd = -particle.gravity / dist;
+      particle.v_x += (dx / gd) * particle.mul_x + particle.add_x;
+      particle.v_y += (dy / gd) * particle.mul_y + particle.add_y;
       particle.p_x += particle.v_x;
       particle.p_y += particle.v_y;
 
-      if (particle.p_x > 0 && particle.p_x < width && particle.p_y > 0 && particle.p_y < height) {
-        traces.store(tracesDrawn, particle.p_x, particle.p_y, Math.sqrt(particle.v_x*particle.v_x + particle.v_y*particle.v_y));
+      if (
+        particle.p_x > 0 &&
+        particle.p_x < width &&
+        particle.p_y > 0 &&
+        particle.p_y < height
+      ) {
+        traces.store(
+          tracesDrawn,
+          particle.p_x,
+          particle.p_y,
+          Math.sqrt(particle.v_x * particle.v_x + particle.v_y * particle.v_y),
+        );
         tracesDrawn++;
         if (tracesDrawn >= numTraces) {
           break;
@@ -78,7 +99,8 @@ export class ParticleEngine {
       shapesStore.isShapesMode ? s.mul.scale(1) : Point.one(),
     );
     this.numTracesPerFrame = s.initTracesPerFrame;
-    this.multiplier = s.minMultiplier + Math.random() * (s.maxMultiplier - s.minMultiplier);
+    this.multiplier =
+      s.minMultiplier + Math.random() * (s.maxMultiplier - s.minMultiplier);
     this.frameCount = 0;
     s.totalTraces = 0;
   }

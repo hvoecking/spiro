@@ -38,6 +38,7 @@ I wanted to build a visualization while I play music on my TV to avoid burn-in
 - [x] **Rendering Options**: Switch between JS, WebAssembly and select 32 or 64 bits of floating point precision
 
 ### Todo
+
 - [x] Play/Pause UI element
 - [x] Prev and next seed
 - [x] Menu Buttons in upper left
@@ -48,6 +49,7 @@ I wanted to build a visualization while I play music on my TV to avoid burn-in
 - [ ] Add like/dislike buttons
 
 ### Bugs
+
 - Keyboard input in binary seed not working properly
 
 ---
@@ -55,31 +57,35 @@ I wanted to build a visualization while I play music on my TV to avoid burn-in
 ## Installation
 
 1. Clone the repository
-    ```bash
-    git clone https://github.com/hvoecking/spiro.git
-    ```
+
+   ```bash
+   git clone https://github.com/hvoecking/spiro.git
+   ```
 
 2. Install npm dependencies
-    ```bash
-    npm install
-    ```
+
+   ```bash
+   npm install
+   ```
 
 3. Install external dependencies
-  * In order to convert small icons to base64 strings and embed them as style sheets the [`convert`](https://imagemagick.org/script/convert.php) command from [ImageMagic](https://imagemagick.org/script/download.php) must be available as a shell command.
+
+- In order to convert small icons to base64 strings and embed them as style sheets the [`convert`](https://imagemagick.org/script/convert.php) command from [ImageMagic](https://imagemagick.org/script/download.php) must be available as a shell command.
 
 ---
 
 ## Usage
 
 1. Build the project
-    ```bash
-    npm run build
-    ```
+
+   ```bash
+   npm run build
+   ```
 
 2. Start the development server
-    ```bash
-    npm run dev
-    ```
+   ```bash
+   npm run dev
+   ```
 
 ---
 
@@ -100,46 +106,58 @@ This project is licensed under the MIT License.
 For any questions or feedback, please contact [me@heye.dev](mailto:me@heye.dev).
 
 # Contribution Notes
+
 ## HTML/Tailwind CSS
+
 ### Recommended Order for Tailwind CSS Classes
 
 1. **Layout and Box Model**
-    - `container`, `box`, `block`, `hidden`
-    - Reasoning: These classes lay the foundation for the element's structure.
+
+   - `container`, `box`, `block`, `hidden`
+   - Reasoning: These classes lay the foundation for the element's structure.
 
 2. **Positioning**
-    - `relative`, `absolute`, `fixed`
-    - Reasoning: They set the element's position in relation to its parent or the viewport.
+
+   - `relative`, `absolute`, `fixed`
+   - Reasoning: They set the element's position in relation to its parent or the viewport.
 
 3. **Display**
-    - `flex`, `grid`, `inline`, `inline-block`
-    - Reasoning: These classes determine how the element should be displayed, often impacting its children.
+
+   - `flex`, `grid`, `inline`, `inline-block`
+   - Reasoning: These classes determine how the element should be displayed, often impacting its children.
 
 4. **Flexbox and Grid Layout**
-    - `justify-`, `items-`, `gap-`, `grid-cols-`
-    - Reasoning: These are specific to flexbox and grid layouts, dictating how children should be organized.
+
+   - `justify-`, `items-`, `gap-`, `grid-cols-`
+   - Reasoning: These are specific to flexbox and grid layouts, dictating how children should be organized.
 
 5. **Spacing**
-    - `p-`, `px-`, `py-`, `m-`, `mx-`, `my-`
-    - Reasoning: These classes influence the spacing around the element, a key aspect of layout.
+
+   - `p-`, `px-`, `py-`, `m-`, `mx-`, `my-`
+   - Reasoning: These classes influence the spacing around the element, a key aspect of layout.
 
 6. **Dimensions**
-    - `w-`, `h-`, `min-h-`, `max-w-`
-    - Reasoning: Directly responsible for the size of the element.
+
+   - `w-`, `h-`, `min-h-`, `max-w-`
+   - Reasoning: Directly responsible for the size of the element.
 
 7. **Typography**
-    - `font-`, `text-`, `leading-`, `tracking-`
-    - Reasoning: These classes set the text properties, which are often specific to content within the element.
+
+   - `font-`, `text-`, `leading-`, `tracking-`
+   - Reasoning: These classes set the text properties, which are often specific to content within the element.
 
 8. **Visuals**
-    - `bg-`, `rounded-`, `shadow-`
-    - Reasoning: These classes are mainly cosmetic but can affect the element's visibility and focus.
+
+   - `bg-`, `rounded-`, `shadow-`
+   - Reasoning: These classes are mainly cosmetic but can affect the element's visibility and focus.
 
 9. **Interactivity**
-    - `cursor-`, `hover:`, `focus:`, `active:`
-    - Reasoning: These classes affect how the element interacts with user input.
+
+   - `cursor-`, `hover:`, `focus:`, `active:`
+   - Reasoning: These classes affect how the element interacts with user input.
 
 10. **SVG and Media**
+
     - `fill-`, `stroke-`
     - Reasoning: These are specific to SVG and media elements, often not applicable to standard HTML elements.
 

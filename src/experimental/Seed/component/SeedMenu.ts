@@ -5,7 +5,7 @@ import { Seed, seedStore } from "../state/SeedStore";
 
 import * as bip39 from "bip39";
 import { Buffer } from "buffer";
-(globalThis as unknown as { Buffer: typeof Buffer }).Buffer = Buffer;  // For bip39
+(globalThis as unknown as { Buffer: typeof Buffer }).Buffer = Buffer; // For bip39
 
 interface SeedMenuComponent extends XAlpineComponent {
   seed: Seed;
@@ -38,13 +38,16 @@ export function mnemonicFromSeed(seed: Seed, pad: boolean = false): string {
     hex += hexDigit;
   }
   const mnemonic = bip39.entropyToMnemonic(hex);
-  return mnemonic.split(" ").map(s => s.padStart(pad ? 8 : 0, " ")).join(" ");
+  return mnemonic
+    .split(" ")
+    .map((s) => s.padStart(pad ? 8 : 0, " "))
+    .join(" ");
 }
 
 export function seedFromMnemonic(mnemonic: string) {
   let seedBinary = "";
   for (const byte of Buffer.from(bip39.mnemonicToEntropy(mnemonic), "hex")) {
-    seedBinary += byte.toString(2).padStart(8, "0");  // Convert each byte to its 8-bit binary representation
+    seedBinary += byte.toString(2).padStart(8, "0"); // Convert each byte to its 8-bit binary representation
   }
   return seedBinary.split("");
 }
@@ -56,7 +59,7 @@ function signedSeedPart(
   sign: string | null,
   dec: string,
   bin: string,
-  initialValue: number = 0
+  initialValue: number = 0,
 ) {
   const numberBits = bits - (sign ? 1 : 0);
   const width = `${numberBits * 0.7 + 0.7}em`;
@@ -115,9 +118,7 @@ function signedSeedPart(
         <input
           @input="updateFromDec()"
           id="${dec}-slider"
-          max="${
-            2 ** numberBits - 1
-          }"
+          max="${2 ** numberBits - 1}"
           min="0"
           style="width: ${width};"
           type="range"
@@ -126,28 +127,18 @@ function signedSeedPart(
       </td>
     </tr>
     <tr>
-      ${
-        sign
-          ? `<td x-text="${sign} ? '-' : '+'" style="text-align: right;"></td>`
-          : ""
-      }
+      ${sign ? `<td x-text="${sign} ? '-' : '+'" style="text-align: right;"></td>` : ""}
       <td><input
         @input="updateFromDec()"
         class="bg-transparent"
         id="${dec}-text"
-        max="${
-          2 ** numberBits - 1
-        }"
+        max="${2 ** numberBits - 1}"
         min="0"
         type="number"
         x-model="${dec}" /></td>
     </tr>
     <tr>
-      ${
-        sign
-          ? `<td x-text="${sign} ? 1 : 0" style="text-align: center;"></td>`
-          : ""
-      }
+      ${sign ? `<td x-text="${sign} ? 1 : 0" style="text-align: center;"></td>` : ""}
       <td>
         <input
           @input="updateFromBin()"
@@ -207,11 +198,17 @@ export function seedMenuFactory() {
           seedStore.setSeed("1".repeat(128).split(""), true);
         } else {
           // Fake a 128-bit precision by spreading the 53 bits of Number.MAX_SAFE_INTEGER
-          seedStore.setSeed((
-            (BigInt(value) << BigInt(75)) +
-            (BigInt(value) << BigInt(22)) +
-            (BigInt(value) >> BigInt(31))
-          ).toString(2).padStart(128, "0").split(""), true);
+          seedStore.setSeed(
+            (
+              (BigInt(value) << BigInt(75)) +
+              (BigInt(value) << BigInt(22)) +
+              (BigInt(value) >> BigInt(31))
+            )
+              .toString(2)
+              .padStart(128, "0")
+              .split(""),
+            true,
+          );
         }
       },
 
@@ -262,7 +259,7 @@ export function seedMenuFactory() {
             signed ? `sign${name}` : null,
             `dec${name}`,
             `bin${name}`,
-            3
+            3,
           );
           pos += bits;
           Object.assign(this, generated.model);
@@ -272,7 +269,8 @@ export function seedMenuFactory() {
           seedConfigHtml += generated.html;
         });
 
-        document.querySelector<HTMLDivElement>("#seedConfig")!.innerHTML = seedConfigHtml;
+        document.querySelector<HTMLDivElement>("#seedConfig")!.innerHTML =
+          seedConfigHtml;
 
         if (!mnemonicsStore.loadFromLocationHash()) {
           mnemonicsStore.newMnemonic();
