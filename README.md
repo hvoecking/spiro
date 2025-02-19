@@ -87,6 +87,20 @@ I wanted to build a visualization while I play music on my TV to avoid burn-in
    npm run dev
    ```
 
+## Testing
+
+1. Run jest tests
+
+   ```bash
+   npm run test
+   ```
+
+2. Run cypress tests
+
+   ```bash
+   npm run test:cypress
+   ```
+
 ---
 
 ## Screenshots & Demo
