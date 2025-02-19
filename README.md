@@ -85,7 +85,7 @@ I wanted to build a visualization while I play music on my TV to avoid burn-in
 
 ## Screenshots & Demo
 
-For a live demo visit [hvo.io](http://hvo.io).
+For a live demo visit [spiro.heye.dev](https://spiro.heye.dev).
 
 ---
 
@@ -97,7 +97,7 @@ This project is licensed under the MIT License.
 
 ## Author
 
-For any questions or feedback, please contact [heye@hvo.io](mailto:heye@hvo.io).
+For any questions or feedback, please contact [me@heye.dev](mailto:me@heye.dev).
 
 # Contribution Notes
 ## HTML/Tailwind CSS
