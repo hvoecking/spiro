@@ -1,6 +1,6 @@
 {
   "name": "spiro",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "dependencies": {
     "alpinejs": "^3.13.0",
     "assemblyscript": "^0.27.34",
