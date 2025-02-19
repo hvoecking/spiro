@@ -54,7 +54,10 @@ export class Player {
       return;
     }
 
-    if (this.pauseStartReason === PauseStartReason.MAX_TRACES_DRAWN) {
+    if (
+      this.pauseStartReason === PauseStartReason.MAX_TRACES_DRAWN ||
+      this.pauseStartReason === PauseStartReason.AUTO_ADVANCE_DELAY_EXPIRED
+    ) {
       if (pauseEndReason === PauseEndReason.AUTO_ADVANCE_ENABLED) {
         mnemonicsStore.nextMnemonic();
         this.unpause();
@@ -94,6 +97,7 @@ export enum PauseStartReason {
   PLAY_PAUSE_BUTTON_CLICKED = "PLAY_PAUSE_BUTTON_CLICKED",
   TAB_HIDDEN = "TAB_HIDDEN",
   SHUTDOWN = "SHUTDOWN",
+  AUTO_ADVANCE_DELAY_EXPIRED = "AUTO_ADVANCE_DELAY_EXPIRED",
 }
 export enum PauseEndReason {
   AUTO_ADVANCE_ENABLED = "AUTO_ADVANCE_ENABLED",
