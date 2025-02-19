@@ -2,12 +2,17 @@
 <html
   lang="en"
   x-data="documentComponent()"
-  style="background-color: #000; /* can't use bg-black as this needs to be applied when page reloads immediatley */"
+  style="
+    background-color: #000; /* can't use bg-black as this needs to be applied when page reloads immediatley */
+  "
   :class="{ 'invert': !$store.darkMode.isDarkMode }"
 >
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+    />
     <title>SPIRO</title>
     <style>
       /* Can't be in styles.css because it needs to be loaded before page is rendered */
@@ -35,10 +40,7 @@
       'cursor-none': !$store.inactivityTracker.isActive && fullScreenHandler.isFullScreen(),
     }"
     x-cloak
-    class="
-      absolute top-0 left-0 w-full h-full
-      overflow-hidden
-    "
+    class="absolute left-0 top-0 h-full w-full overflow-hidden"
   >
     <x-inactivity-tracker></x-inactivity-tracker>
 
@@ -56,42 +58,17 @@
         'translate-x-0': $store.sideMenu.isOpen,
       }"
       @escape.window="$store.sideMenu.isOpen = false"
-      class="
-        /* Layout and Box Model */
-        absolute h-full w-64 top-0 left-0 z-20 overflow-visible
-
-        /* Display & Typography */
-        text-sm
-
-        /* Visuals */
-        bg-gray-800
-
-        /* Transitions and Animations */
-        duration-300 ease-in-out transition-transform origin-left
-      "
+      class="absolute left-0 top-0 z-20 h-full w-64 origin-left overflow-visible bg-gray-800 text-sm transition-transform duration-300 ease-in-out"
       id="side-menu"
       data-test-id="side-menu"
     >
       <!-- Outer flex container -->
-      <div class="flex flex-col h-full">
-
+      <div class="flex h-full flex-col">
         <!-- Inner scrollable container -->
         <div class="flex-grow">
           <div
             @click="$store.sideMenu.isOpen = !$store.sideMenu.isOpen"
-            class="
-              /* Layout and Box Model */
-              flex p-2
-
-              /* Flexbox & Grid */
-              items-center justify-between
-
-              /* Visuals */
-              bg-gray-800 text-white hover:bg-gray-600
-
-              /* Interactivity */
-              cursor-pointer
-            "
+            class="flex cursor-pointer items-center justify-between bg-gray-800 p-2 text-white hover:bg-gray-600"
             data-test-id="settings"
           >
             <p>Settings</p>
@@ -104,26 +81,14 @@
                 'translate-x-12': !$store.sideMenu.isOpen && $store.spiroAnimation.hasStarted,
                 'translate-x-1 rotate-180': $store.sideMenu.isOpen,
               }"
-              class="
-                transition-all
-                pr-4
-                origin-left
-                text-xl font-bold
-                text-white
-                select-none cursor-pointer
-                duration-300
-              "
+              class="origin-left cursor-pointer select-none pr-4 text-xl font-bold text-white transition-all duration-300"
+              data-test-id="settings-chevron"
             >
-            ›
+              ›
             </span>
           </div>
           <div
-            class="
-              flex items-center justify-between
-              p-2
-              bg-gray-700 text-white hover:bg-gray-600
-              cursor-pointer
-            "
+            class="flex cursor-pointer items-center justify-between bg-gray-700 p-2 text-white hover:bg-gray-600"
             @click="fullScreenHandler.toggleFullScreen()"
           >
             <div>
@@ -137,15 +102,7 @@
                 'relative': !($store.sideMenu.isOpen && $store.spiroAnimation.hasStarted),
                 'translate-x-16': (!$store.sideMenu.isOpen && $store.spiroAnimation.hasStarted),
               }"
-              class="
-                inline-block
-                align-middle
-                w-10
-                mr-2
-                transition duration-200 ease-in
-                overflow-visible select-none
-                slide-in
-              "
+              class="slide-in mr-2 inline-block w-10 select-none overflow-visible align-middle transition duration-200 ease-in"
             >
               <x-full-screen-button class="translate-x-2"></x-full-screen-button>
             </div>
@@ -186,7 +143,7 @@
 
           <div
             @click="$store.sideMenu.isAdvancedMenuOpen = !$store.sideMenu.isAdvancedMenuOpen"
-            class="flex items-center justify-between p-2 bg-gray-800 text-white hover:bg-gray-600 cursor-pointer"
+            class="flex cursor-pointer items-center justify-between bg-gray-800 p-2 text-white hover:bg-gray-600"
           >
             <p>Advanced Settings</p>
             <span
@@ -194,16 +151,9 @@
                 'rotate-0': !$store.sideMenu.isAdvancedMenuOpen,
                 'rotate-90': $store.sideMenu.isAdvancedMenuOpen,
               }"
-              class="
-                transition-transform
-                mr-4
-                text-xl font-bold
-                text-white
-                select-none cursor-pointer
-                duration-300
-              "
+              class="mr-4 cursor-pointer select-none text-xl font-bold text-white transition-transform duration-300"
             >
-            ›
+              ›
             </span>
           </div>
 
@@ -242,7 +192,7 @@
 
             <div
               @click="$store.sideMenu.isExperimentalMenuOpen = !$store.sideMenu.isExperimentalMenuOpen"
-              class="flex items-center justify-between p-2 bg-gray-800 text-white hover:bg-gray-600 cursor-pointer"
+              class="flex cursor-pointer items-center justify-between bg-gray-800 p-2 text-white hover:bg-gray-600"
             >
               <p>Experimental Settings</p>
               <span
@@ -250,16 +200,9 @@
                   'rotate-0': !$store.sideMenu.isExperimentalMenuOpen,
                   'rotate-90': $store.sideMenu.isExperimentalMenuOpen,
                 }"
-                class="
-                  transition-transform
-                  mr-4
-                  text-xl font-bold
-                  text-white
-                  select-none cursor-pointer
-                  duration-300
-                "
+                class="mr-4 cursor-pointer select-none text-xl font-bold text-white transition-transform duration-300"
               >
-              ›
+                ›
               </span>
             </div>
 
@@ -298,15 +241,18 @@
               </x-toggle-switch>
               <!-- Rendering Quality Slider -->
               <div
-                class="
-                  flex items-center justify-between
-                  p-2
-                  text-white bg-gray-700 hover:bg-gray-600
-                  cursor-pointer
-                "
+                class="flex cursor-pointer items-center justify-between bg-gray-700 p-2 text-white hover:bg-gray-600"
               >
                 <div>Rendering Quality</div>
-                <input class="w-full" type="range" min="1" max="10" step="0.1" :value="$store.renderQuality.quality" @input="$store.renderQuality.setRenderingQuality($event.target.valueAsNumber)">
+                <input
+                  class="w-full"
+                  type="range"
+                  min="1"
+                  max="10"
+                  step="0.1"
+                  :value="$store.renderQuality.quality"
+                  @input="$store.renderQuality.setRenderingQuality($event.target.valueAsNumber)"
+                />
               </div>
             </div>
           </div>
@@ -314,18 +260,10 @@
 
         <div
           @click="$store.about.isOpen = !$store.about.isOpen"
-          class="flex items-center justify-between p-2 bg-gray-700 text-white hover:bg-gray-600 cursor-pointer"
+          class="flex cursor-pointer items-center justify-between bg-gray-700 p-2 text-white hover:bg-gray-600"
         >
           <p>About</p>
-          <span
-            class="
-              info-icon
-              mr-4
-              h-4 w-4
-              cursor-pointer
-            "
-          >
-          </span>
+          <span class="info-icon mr-4 h-4 w-4 cursor-pointer"> </span>
         </div>
       </div>
     </div>
@@ -336,20 +274,12 @@
         'opacity-100': $store.inactivityTracker.isActive,
         '-translate-y-full': !$store.spiroAnimation.hasStarted,
       }"
-      class="
-        absolute top-0 right-0 z-10
-        p-3
-        transition duration-200 ease-in slide-in
-      "
+      class="slide-in absolute right-0 top-0 z-10 p-3 transition duration-200 ease-in"
     >
       <div
         @click="$store.about.isOpen = !$store.about.isOpen"
         x-show="!$store.performance.isOpen && !$store.about.isOpen"
-        class="
-          w-4 h-4
-          opacity-80 hover:opacity-100
-          cursor-pointer info-icon
-        "
+        class="info-icon h-4 w-4 cursor-pointer opacity-80 hover:opacity-100"
         data-test-id="info"
       ></div>
     </div>
@@ -365,24 +295,14 @@
         'opacity-0': !$store.inactivityTracker.isActive || $store.seed.isOpen,
         'opacity-100': $store.inactivityTracker.isActive && !$store.seed.isOpen,
       }"
-      class="
-        absolute bottom-0 left-1/2 z-10
-        -translate-x-1/2 mb-20
-        transition duration-200 ease-in
-        slide-in
-      "
+      class="slide-in absolute bottom-0 left-1/2 z-10 mb-20 -translate-x-1/2 transition duration-200 ease-in"
     >
     </x-player-interface>
     <x-player-ghost-image-animation
       :class="{
         'translate-y-28': !$store.spiroAnimation.hasStarted,
       }"
-      class="
-        absolute bottom-0 left-1/2 z-10
-        -translate-x-1/2 mb-20
-        transition duration-200 ease-in
-        slide-in
-      "
+      class="slide-in absolute bottom-0 left-1/2 z-10 mb-20 -translate-x-1/2 transition duration-200 ease-in"
     >
     </x-player-ghost-image-animation>
 
@@ -391,17 +311,7 @@
         'translate-y-full': !$store.spiroAnimation.hasStarted,
         'opacity-0': !$store.inactivityTracker.isActive || $store.seed.isOpen,
       }"
-      class="
-        slide-in
-        transition
-        duration-200
-        ease-in
-        absolute
-        -translate-x-1/2
-        left-1/2
-        z-10
-        bottom-0
-      "
+      class="slide-in absolute bottom-0 left-1/2 z-10 -translate-x-1/2 transition duration-200 ease-in"
     >
       <x-speed-selector></x-speed-selector>
     </div>
@@ -414,12 +324,7 @@
         'translate-x-full': !$store.spiroAnimation.hasStarted,
         'translate-x-1/2': $store.spiroAnimation.hasStarted,
       }"
-      class="
-        absolute top-1/2 right-0
-        m-3
-        rotate-90
-        transition-all duration-200 ease-in slide-in
-      "
+      class="slide-in absolute right-0 top-1/2 m-3 rotate-90 transition-all duration-200 ease-in"
       style="
         width: 50vh; /* Component is 90deg rotated so we base the width on the height */
       "
@@ -431,14 +336,14 @@
         'opacity-0': !$store.inactivityTracker.isActive,
         'translate-x-full': !$store.spiroAnimation.hasStarted,
       }"
-      class="
-        absolute bottom-0 right-0 z-10
-        transition duration-200 ease-in slide-in
-      "
+      class="slide-in absolute bottom-0 right-0 z-10 transition duration-200 ease-in"
       data-id="primary-share-button"
     >
     </x-share-button>
 
-    <script type="module" src="/src/main.ts"></script>
+    <script
+      type="module"
+      src="/src/main.ts"
+    ></script>
   </body>
 </html>

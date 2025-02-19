@@ -24,8 +24,7 @@ import { PerformanceSampler } from "../../Performance/service/PerformanceTracker
 import { AsTraces } from "../service/AsTraces";
 
 let animationFrameId: number | null = null;
-export type AnimatedWindow = Window &
-  typeof globalThis & { stopAnimation: boolean };
+export type AnimatedWindow = Window & typeof globalThis & { stopAnimation: boolean };
 (window as AnimatedWindow).stopAnimation = false;
 
 interface ParticleEngineCanvasComponent extends XAlpineComponent {
@@ -38,7 +37,7 @@ interface ParticleEngineCanvasComponent extends XAlpineComponent {
 export function particleEngineCanvasFactory(
   fpsManager: FpsManager,
   player: Player,
-  particleEngine: ParticleEngine
+  particleEngine: ParticleEngine,
 ) {
   function particleEngineCanvasComponent(this: ParticleEngineCanvasComponent) {
     const canvas = this.$refs.canvas;
@@ -57,7 +56,7 @@ export function particleEngineCanvasFactory(
       if (lastChange) {
         const lastOldCtx = lastOldCanvas!.getContext("2d")!;
         const timeSinceLastChange = Date.now() - lastChange;
-        lastOldCtx.globalAlpha = 0.9 - (0.1 * Math.pow(0.9, timeSinceLastChange * 0.01));
+        lastOldCtx.globalAlpha = 0.9 - 0.1 * Math.pow(0.9, timeSinceLastChange * 0.01);
         lastOldCtx.drawImage(lastOldCanvas!.transferToImageBitmap(), 0, 0);
         ctx.drawImage(lastOldCanvas!, 0, 0);
         if (timeSinceLastChange > 1000) {
@@ -70,14 +69,15 @@ export function particleEngineCanvasFactory(
     try {
       renderWorker = new Worker(
         new URL("../service/RenderWorker.ts", import.meta.url),
-        { type: "module" },
+        {
+          type: "module",
+        },
       );
-      renderWorker.onmessage = event => {
+      renderWorker.onmessage = (event) => {
         const { imageBitmap, duration } = event.data;
 
         currentCanvas.getContext("2d")!.drawImage(imageBitmap, 0, 0);
         renderOnscreen(currentCanvas, duration);
-
       };
     } catch (e) {
       console.error(e);
@@ -116,7 +116,7 @@ export function particleEngineCanvasFactory(
       shouldUpdate() {
         particleEngineStore.adjustMaxTracesPerFrame(
           fpsManager.calculateAdjustment(),
-          renderQualityStore.quality
+          renderQualityStore.quality,
         );
 
         if (!particleEngine) return false;
@@ -134,7 +134,9 @@ export function particleEngineCanvasFactory(
 
         if (resetHandler.resetRequested()) {
           if (!particleEngineStore.useWebworker) {
-            currentCanvas.getContext("2d")!.clearRect(0, 0, canvas.width, canvas.height);
+            currentCanvas
+              .getContext("2d")!
+              .clearRect(0, 0, canvas.width, canvas.height);
           }
           resetHandler.performReset();
           return false;
@@ -198,16 +200,13 @@ export function particleEngineCanvasFactory(
           renderTimeSampler.end();
           renderOnscreen(currentCanvas, renderTimeSampler.getDuration());
         } else {
-          this.callRenderWorker(
-            "render",
-            {
-              color: particleEngineStore.color.toString(),
-              traces: traces.serialize(),
-              isRenderVelocity: renderQualityStore.isRenderVelocity,
-              vScaling: renderQualityStore.vScaling,
-              quality: renderQualityStore.quality,
-            },
-          );
+          this.callRenderWorker("render", {
+            color: particleEngineStore.color.toString(),
+            traces: traces.serialize(),
+            isRenderVelocity: renderQualityStore.isRenderVelocity,
+            vScaling: renderQualityStore.vScaling,
+            quality: renderQualityStore.quality,
+          });
         }
       },
 
@@ -224,13 +223,10 @@ export function particleEngineCanvasFactory(
         currentCanvas.width = window.innerWidth;
         currentCanvas.height = window.innerHeight;
         if (particleEngineStore.useWebworker) {
-          this.callRenderWorker(
-            "resize",
-            {
-              canvasWidth: canvas.width,
-              canvasHeight: canvas.height,
-            },
-          );
+          this.callRenderWorker("resize", {
+            canvasWidth: canvas.width,
+            canvasHeight: canvas.height,
+          });
         }
       },
 
@@ -247,12 +243,9 @@ export function particleEngineCanvasFactory(
         });
         resetHandler.registerListener(() => {
           renderQualityStore.vScaling = Infinity;
-          this.callRenderWorker(
-            "reset",
-            {
-              color: canvas.style.backgroundColor,
-            },
-          );
+          this.callRenderWorker("reset", {
+            color: canvas.style.backgroundColor,
+          });
           this.nextFrame(true);
         });
         window.addEventListener("resize", () => {
@@ -270,6 +263,6 @@ export function particleEngineCanvasFactory(
   return new XComponent(
     template,
     "particle-engine-canvas",
-    particleEngineCanvasComponent
+    particleEngineCanvasComponent,
   );
 }

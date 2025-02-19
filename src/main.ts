@@ -74,7 +74,7 @@ Alpine.data("documentComponent", () => {
       function preventDefault(e: TouchEvent) {
         e.preventDefault();
       }
-      document.addEventListener("keydown", ev => ev.key === "Escape" && dispatch("escape"));
+      document.addEventListener("keydown", (ev) => ev.key === "Escape" && dispatch("escape"));
     },
   };
 });
@@ -82,11 +82,11 @@ Alpine.data("documentComponent", () => {
 Alpine.start();
 
 document.addEventListener("DOMContentLoaded", () => {
-  getXComponents().forEach(c => registerXComponent(c));
+  getXComponents().forEach((c) => registerXComponent(c));
 });
 
 document.addEventListener("shutdown", () => {
-  document.body.childNodes.forEach(node => {
+  document.body.childNodes.forEach((node) => {
     node.remove();
   });
 });

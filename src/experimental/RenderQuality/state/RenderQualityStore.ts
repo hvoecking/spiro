@@ -13,10 +13,7 @@ const _store = {
   },
   setRenderingQuality(quality: number) {
     this.quality = quality;
-    particleEngineStore.adjustToRenderingQuality(
-      quality,
-      advancerStore.autoAdvanceSpeed
-    );
+    particleEngineStore.adjustToRenderingQuality(quality, advancerStore.autoAdvanceSpeed);
   },
 };
 

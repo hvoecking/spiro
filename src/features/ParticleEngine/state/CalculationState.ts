@@ -14,24 +14,24 @@ const PAGES = ((TRACES_SIZE + PARTICLE_STATE_SIZE) / 64) * 4;
 function newWasmF64Array(
   module: WebAssembly.Instance,
   memory: WebAssembly.Memory,
-  size: number
+  size: number,
 ) {
   return new Float64Array(
     memory.buffer,
     (module.exports.newFloat64Array as CallableFunction)(size),
-    size
+    size,
   );
 }
 
 function newWasmF32Array(
   module: WebAssembly.Instance,
   memory: WebAssembly.Memory,
-  size: number
+  size: number,
 ) {
   return new Float32Array(
     memory.buffer,
     (module.exports.newFloat32Array as CallableFunction)(size),
-    size
+    size,
   );
 }
 
@@ -143,8 +143,15 @@ export class CalculationState {
   }
 
   calculateTraces(width: number, height: number, maxTraces: number): number {
-    if (calculationStateStore.isWasmMode && calculationStateStore.isWasmModuleLoaded && this.wasmCalculateTracesF32 && this.wasmCalculateTracesF64) {
-      const wasmCalculateTraces = calculationStateStore.isHighPrecisionMode ? this.wasmCalculateTracesF64 : this.wasmCalculateTracesF32;
+    if (
+      calculationStateStore.isWasmMode &&
+      calculationStateStore.isWasmModuleLoaded &&
+      this.wasmCalculateTracesF32 &&
+      this.wasmCalculateTracesF64
+    ) {
+      const wasmCalculateTraces = calculationStateStore.isHighPrecisionMode
+        ? this.wasmCalculateTracesF64
+        : this.wasmCalculateTracesF32;
       return wasmCalculateTraces(
         width,
         height,
@@ -158,18 +165,12 @@ export class CalculationState {
         height,
         new AsParticle(this.getState().particleState),
         new AsTraces(this.getState().traces),
-        maxTraces
+        maxTraces,
       );
     }
   }
 
-  reset(
-    position: Point,
-    velocity: Point,
-    gravity: number,
-    add: Point,
-    mul: Point
-  ) {
+  reset(position: Point, velocity: Point, gravity: number, add: Point, mul: Point) {
     const state = this.getState();
     state.traces.fill(0);
     state.particleState[0] = position.x;
@@ -210,8 +211,10 @@ export class CalculationState {
     calculationStateStore.isWasmModuleLoaded = true;
     this.wasmF32State = new WasmF32State(instance, memory);
     this.wasmF64State = new WasmF64State(instance, memory);
-    this.wasmCalculateTracesF32 = instance.exports.calculateTracesF32 as CallableFunction;
-    this.wasmCalculateTracesF64 = instance.exports.calculateTracesF64 as CallableFunction;
+    this.wasmCalculateTracesF32 = instance.exports
+      .calculateTracesF32 as CallableFunction;
+    this.wasmCalculateTracesF64 = instance.exports
+      .calculateTracesF64 as CallableFunction;
   }
 
   abortHandler(_msg: string, _file: string, line: number, column: number) {

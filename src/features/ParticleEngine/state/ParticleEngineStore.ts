@@ -27,7 +27,7 @@ export class Color {
   constructor(
     readonly hue: number,
     readonly saturation: number,
-    readonly value: number
+    readonly value: number,
   ) {}
 
   toString() {
@@ -45,14 +45,20 @@ function parseSingnedSlice(index: number, length: number) {
   return parseSign(index) * parseUnsingnedSlice(index + 1, length - 1);
 }
 
-export function adjustedMaxTotalTraces(speed: AutoAdvanceSpeeds, quality: number): number {
+export function adjustedMaxTotalTraces(
+  speed: AutoAdvanceSpeeds,
+  quality: number,
+): number {
   if (quality == 1) {
     return MAX_TOTAL_TRACES[speed];
   }
   return MAX_TOTAL_TRACES[speed] * quality * QUALITY_TRACES_FACTOR;
 }
 
-export function adjustedMaxTracesPerFrame(speed: AutoAdvanceSpeeds, quality: number): number {
+export function adjustedMaxTracesPerFrame(
+  speed: AutoAdvanceSpeeds,
+  quality: number,
+): number {
   if (quality == 1) {
     return MAX_TRACES_PER_FRAME[speed];
   }
@@ -84,24 +90,19 @@ const _store = {
     this.maxTracesPerFrame = clamp(
       this.maxTracesPerFrame * adjustment,
       MAX_TRACES_PER_FRAME[AutoAdvanceSpeeds.SLOW] * quality,
-      MAX_TRACES_PER_FRAME[AutoAdvanceSpeeds.FAST] * quality
+      MAX_TRACES_PER_FRAME[AutoAdvanceSpeeds.FAST] * quality,
     );
   },
 
-  adjustToRenderingQuality(
-    quality: number,
-    autoAdvanceSpeed: AutoAdvanceSpeeds
-  ) {
+  adjustToRenderingQuality(quality: number, autoAdvanceSpeed: AutoAdvanceSpeeds) {
     this.maxTracesPerFrame = Math.min(
       PHYSICAL_MAX_TRACES_PER_FRAME,
       adjustedMaxTracesPerFrame(autoAdvanceSpeed, quality),
     );
     this.maxTotalTraces = adjustedMaxTotalTraces(autoAdvanceSpeed, quality);
     this.currentMaxTotalTraces = adjustedMaxTotalTraces(autoAdvanceSpeed, quality);
-    this.maxMultiplier =
-      1.2 * quality * (1 + quality / 10);
-    this.minMultiplier =
-      1.05 * quality * (1 + quality / 10);
+    this.maxMultiplier = 1.2 * quality * (1 + quality / 10);
+    this.minMultiplier = 1.05 * quality * (1 + quality / 10);
   },
 
   setMaxTotalTraces(newMaxTotalTraces: number) {
@@ -114,27 +115,21 @@ const _store = {
     this.immediateFeedback = immediateFeedback;
     this.center = center;
     this.scale = scale;
-    this.initPosition = new Point(
-      parseSingnedSlice(0, 16),
-      parseSingnedSlice(16, 16)
-    );
+    this.initPosition = new Point(parseSingnedSlice(0, 16), parseSingnedSlice(16, 16));
     this.initVelocity = new Point(
       parseSign(32) * 2 ** 8 + parseSingnedSlice(32, 16) * 2,
-      parseSign(48) * 2 ** 8 + parseSingnedSlice(48, 16) * 2
+      parseSign(48) * 2 ** 8 + parseSingnedSlice(48, 16) * 2,
     );
     this.gravity = 2 ** 17 + parseUnsingnedSlice(64, 16);
     this.color = new Color(
       (parseUnsingnedSlice(80, 9) / 2 ** 9) * 360,
       50 + (parseUnsingnedSlice(89, 7) / 2 ** 7) * 100,
-      50
+      50,
     );
-    this.add = new Point(
-      parseSingnedSlice(96, 8) / 10,
-      parseSingnedSlice(104, 8) / 10
-    );
+    this.add = new Point(parseSingnedSlice(96, 8) / 10, parseSingnedSlice(104, 8) / 10);
     this.mul = new Point(
       parseUnsingnedSlice(112, 8) / 100,
-      parseUnsingnedSlice(120, 8) / 100
+      parseUnsingnedSlice(120, 8) / 100,
     );
   },
 };
