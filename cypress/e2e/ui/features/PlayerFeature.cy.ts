@@ -4,13 +4,8 @@ context("Player Feature", () => {
   setupDefaultActions();
 
   it("User clicks play after initial page load", () => {
-    cy.get("[data-test-id='play-icon']").click();
-    cy.get("[data-test-id='pause-icon']").should("exist");
-  });
-
-  it("User clicks pause while the program is running", () => {
-    cy.get("[data-test-id='pause-icon']").click();
-    cy.get("[data-test-id='play-icon']").should("exist");
+    cy.get("[data-test-id='play-pause-button']").click();
+    cy.get("[data-test-id='play-pause-button']").should("have.class", "play-icon");
   });
 
   it("should toggle play/pause", () => {
