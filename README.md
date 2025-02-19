@@ -38,14 +38,14 @@ I wanted to build a visualization while I play music on my TV to avoid burn-in
 - [x] **Rendering Options**: Switch between JS, WebAssembly and select 32 or 64 bits of floating point precision
 
 ### Todo
-- x Play/Pause UI element
-- x Prev and next seed
-- x Menu Buttons in upper left
-- x Stats display
-- x Hide seed config behind eject button
-- x Load & Save for Mnemonic via share button and URL
-- x Zoom using wheel
-- Add like/dislike buttons
+- [x] Play/Pause UI element
+- [x] Prev and next seed
+- [x] Menu Buttons in upper left
+- [x] Stats display
+- [x] Hide seed config behind eject button
+- [x] Load & Save for Mnemonic via share button and URL
+- [x] Zoom using wheel
+- [ ] Add like/dislike buttons
 
 ### Bugs
 - Keyboard input in binary seed not working properly
