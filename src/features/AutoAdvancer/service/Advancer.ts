@@ -19,6 +19,10 @@ export class AutoAdvancer {
 
   setAutoAdvanceSpeed(speed: AutoAdvanceSpeeds, quality: number) {
     if (!speed) return;
+    // If speed is a number, convert it to a valid AutoAdvanceSpeeds value
+    if (typeof speed === "number") {
+      speed = Object.values(AutoAdvanceSpeeds)[speed];
+    }
     advancerStore.autoAdvanceSpeed = speed;
     particleEngineStore.maxTracesPerFrame = adjustedMaxTracesPerFrame(speed, quality);
     particleEngineStore.maxTotalTraces = adjustedMaxTotalTraces(speed, quality);

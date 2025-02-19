@@ -58,6 +58,9 @@ export class ParticleEngine {
     const centerX = width / 2;
     const centerY = height / 2;
     for (let i = 0; i < Math.max(200, 10 * numTraces); i++) {
+      if (tracesDrawn >= numTraces) {
+        break;
+      }
       const dx = particle.p_x - centerX;
       const dy = particle.p_y - centerY;
       const dist = Math.sqrt(dx * dx + dy * dy);
@@ -80,9 +83,6 @@ export class ParticleEngine {
           Math.sqrt(particle.v_x * particle.v_x + particle.v_y * particle.v_y),
         );
         tracesDrawn++;
-        if (tracesDrawn >= numTraces) {
-          break;
-        }
       }
     }
     particle.store();

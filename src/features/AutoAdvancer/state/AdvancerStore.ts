@@ -12,11 +12,10 @@ export enum AutoAdvanceSpeeds {
 export const INITIAL_AUTO_ADVANCE_SPEED = AutoAdvanceSpeeds.MEDIUM;
 
 export const AUTO_ADVANCE_DELAY = {
-  [AutoAdvanceSpeeds.SLOW]: 16 * 1000,
-  [AutoAdvanceSpeeds.MEDIUM]: 8 * 1000,
-  [AutoAdvanceSpeeds.FAST]: config.autoAdvanceDelaySeconds * 1000,
+  [AutoAdvanceSpeeds.SLOW]: config.autoAdvanceDelaySeconds * 2 * 1000,
+  [AutoAdvanceSpeeds.MEDIUM]: config.autoAdvanceDelaySeconds * 1000,
+  [AutoAdvanceSpeeds.FAST]: (config.autoAdvanceDelaySeconds / 2) * 1000,
 };
-
 
 const _store = {
   speeds: Object.values(AutoAdvanceSpeeds),

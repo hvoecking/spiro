@@ -152,6 +152,19 @@ export function particleEngineCanvasFactory(
 
       update(): AsTraces | null {
         const calculationTimeSampler = performanceStore.calculationTimeTracker.start();
+
+        if (
+          Date.now() - advancerStore.autoAdvanceTimestamp >=
+          AUTO_ADVANCE_DELAY[advancerStore.autoAdvanceSpeed]
+        ) {
+          if (advancerStore.isAutoAdvanceMode) {
+            mnemonicsStore.newMnemonic();
+          } else {
+            player.startPause(PauseStartReason.AUTO_ADVANCE_DELAY_EXPIRED);
+          }
+          return null;
+        }
+
         const traces = particleEngine.calculateTraces(
           canvas.width,
           canvas.height,
