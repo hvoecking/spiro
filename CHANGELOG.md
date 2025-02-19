@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.1](https://github.com/hvoecking/spiro/compare/v0.1.0...v0.1.1) (2025-02-19)
+
+
+### Features
+
+* add automatic version bump of .env file ([22a2d2c](https://github.com/hvoecking/spiro/commit/22a2d2cf8abab933d64629ef5bfbc0c9d499ba6b))
+
 ## 0.1.0 (2025-02-19)
 
 
