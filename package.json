@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "dependencies": {
     "alpinejs": "^3.13.0",
+    "assemblyscript": "^0.27.34",
     "buffer": "^6.0.3",
     "normalize.css": "^8.0.1",
     "svgexport": "^0.4.2",
