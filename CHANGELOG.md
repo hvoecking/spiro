@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.2.0](https://github.com/hvoecking/spiro/compare/v0.1.1...v0.2.0) (2025-02-27)
+
+
+### Features
+
+* use release-please ([e4195a3](https://github.com/hvoecking/spiro/commit/e4195a3334eb9b21d9cca7958e2e558c38ea4173))
+
+
+### Bug Fixes
+
+* **release:** use spiro as package name ([df82ec2](https://github.com/hvoecking/spiro/commit/df82ec298611f5f6b1aa09f0d22af545429b6d8f))
+
 ### [0.1.1](https://github.com/hvoecking/spiro/compare/v0.1.0...v0.1.1) (2025-02-19)
 
 
