@@ -21,7 +21,7 @@ jobs:
         with:
           token: ${{ github.token }}
           release-type: node
-          package-name: audify
+          package-name: spiro
 
       - name: Display outputs
         if: steps.release.outputs.release_created
@@ -57,7 +57,7 @@ jobs:
         run: npm run build
 
       - name: Generate archive name
-        run: echo "ARCHIVE_NAME=audify-${{ needs.release-please.outputs.tag_name }}.zip" >> $GITHUB_ENV
+        run: echo "ARCHIVE_NAME=spiro-${{ needs.release-please.outputs.tag_name }}.zip" >> $GITHUB_ENV
 
       - name: Archive release artifacts
         run: zip -r "${{ env.ARCHIVE_NAME }}" dist
