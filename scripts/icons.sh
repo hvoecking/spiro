@@ -30,6 +30,9 @@ img-to-css() {
 
 png-to-base64() {
     asset=$1; shift
+    # TODO: The convert command is deprecated in ImageMagick 7. But ubuntu 24.04 which
+    # is used in the workflow still uses ImageMagick 6. Once the workflow supports
+    # ImageMagick 7 change this to use the `magick` command.
     echo "url(data:image/png;base64,$(convert $asset -resize 64x - | base64 | tr -d '\n'))"
 }
 
@@ -54,7 +57,8 @@ generate-icons() (
         done
     done
     clean-icons
-    mv "$tmp_build" $(dirname "$BUILD_DIR")
+    mkdir -p $(dirname "$BUILD_DIR")
+    mv "$tmp_build" "$BUILD_DIR"
 )
 
 clean-icons() {

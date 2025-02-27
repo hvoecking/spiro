@@ -61,7 +61,7 @@
     "dev:vite:test": "npm run _build:as && NODE_ENV=test vite --mode test",
     "_dev:vite:open": "vite --open",
     "dev:vite": "npm run _build:as && npm run _dev:vite:open",
-    "dev": "npm run dev:vite -- --open --debug",
+    "dev": "./scripts/icons.sh && npm run dev:vite -- --open --debug",
     "lint": "eslint 'src/**/*.{js,ts}'",
     "preview": "npm run build && vite preview",
     "test:all": "npm run test:jest && npm run test:cypress",

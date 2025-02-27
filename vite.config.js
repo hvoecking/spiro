@@ -15,7 +15,7 @@ const config = {
   },
   plugins: [
     SvgSpritePlugin({
-      input: "assets/icons/*.svg",
+      include: path.resolve("assets/icons/*.svg"),
       symbolId: "icon-[name]-[hash]",
     }),
     watchAndRun([
