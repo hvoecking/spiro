@@ -1,0 +1,73 @@
+name: Release Please
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  release-please:
+    permissions:
+      contents: write # to create release commit (google-github-actions/release-please-action)
+      pull-requests: write # to create release PR (google-github-actions/release-please-action)
+    runs-on: ubuntu-latest
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
+    steps:
+      - name: Run release-please to generate release PR
+        uses: googleapis/release-please-action@v3
+        id: release
+        with:
+          token: ${{ github.token }}
+          release-type: node
+          package-name: audify
+
+      - name: Display outputs
+        if: steps.release.outputs.release_created
+        run: |
+          echo "Created release ${{ steps.release.outputs.tag_name }}"
+          echo "See https://github.com/${{ github.repository }}/releases/tag/${{ steps.release.outputs.tag_name }}"
+
+  # This job only runs when a new release is created by release-please
+  build-and-release:
+    needs: release-please
+    if: ${{ needs.release-please.outputs.release_created }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 21
+
+      - name: Install ImageMagick
+        run: |
+          sudo rm -f /var/lib/man-db/auto-update # Disable man db rebuild
+          sudo apt-get install -y --no-install-recommends imagemagick-6.q16
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build project
+        run: npm run build
+
+      - name: Generate archive name
+        run: echo "ARCHIVE_NAME=audify-${{ needs.release-please.outputs.tag_name }}.zip" >> $GITHUB_ENV
+
+      - name: Archive release artifacts
+        run: zip -r "${{ env.ARCHIVE_NAME }}" dist
+
+      - name: Upload release assets
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ env.ARCHIVE_NAME }}
+          token: ${{ github.token }}
+          tag_name: ${{ needs.release-please.outputs.tag_name }}
+
+      - name: Get release URL
+        run: echo "Release URL https://github.com/${{ github.repository }}/releases/tag/${{ needs.release-please.outputs.tag_name }}"
