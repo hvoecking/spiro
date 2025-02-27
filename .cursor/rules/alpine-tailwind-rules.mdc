@@ -1,0 +1,79 @@
+---
+description: Alpine.js Best Practices
+globs: *.html, *.ts
+---
+# Alpine.js and Tailwind CSS Best Practices
+
+## Alpine.js Principles
+
+### State Management
+- Use Alpine stores (`Alpine.store()`) for shared state instead of component-level getters/setters
+- Access store values with `$store.storeName.property` in templates
+- Modify store values directly rather than through getters/setters when possible
+
+### Reactivity
+- Use `x-data` for component-level state
+- Leverage Alpine's built-in reactivity system with `Alpine.effect()` for watching changes
+- Avoid manual DOM manipulation; let Alpine handle updates
+
+### Directives
+- Use `x-show` with transitions instead of toggling classes for visibility
+- Prefer `x-if` and `x-for` over manual rendering logic
+- Use `x-transition` directives for smooth animations:
+  - `x-transition:enter`, `x-transition:enter-start`, `x-transition:enter-end`
+  - `x-transition:leave`, `x-transition:leave-start`, `x-transition:leave-end`
+
+### Events
+- Use `@event` syntax for event binding
+- Leverage event modifiers like `.prevent`, `.stop`, `.outside`, etc.
+- If it is not possible to leverage the Alpine stores for specific events, use custom events with `$dispatch` for component communication
+
+### Initialization
+- Use `x-init` for component initialization logic
+- Use `Alpine.start()` only once at the application level
+
+## Tailwind CSS Principles
+
+### Layout
+- Use Tailwind's layout utilities (`flex`, `grid`, `container`) instead of custom CSS
+- Use spacing utilities (`p-`, `m-`, `gap-`) for consistent spacing
+- Use responsive prefixes (`sm:`, `md:`, `lg:`, `xl:`) for responsive design
+
+### Styling
+- Use Tailwind's utility classes instead of writing custom CSS
+- Use the `@apply` directive in CSS only when absolutely necessary
+- Use Tailwind's color system with opacity modifiers (`bg-blue-500/50`)
+- Use the new JIT syntax for dynamic values (`w-[200px]`, `top-[70%]`)
+
+### Components
+- Compose complex components from utility classes
+- Use `@layer components` for reusable component styles
+- Extract common patterns to component classes in your Tailwind config
+
+### Transitions and Animations
+- Use Tailwind's transition utilities (`transition`, `duration-`, `ease-`)
+- Combine with Alpine's transition directives for smooth animations
+- Use `transform`, `scale`, `translate`, etc. for transformations
+
+### Best Practices
+- Keep utility composition flat when possible (avoid deep nesting)
+- Use consistent naming conventions for custom classes
+- Use Tailwind's arbitrary value syntax (`[...]`) sparingly
+- Prefer utility classes over inline styles
+
+## Integration Best Practices
+
+- Use Alpine's `x-bind:class` with object syntax for conditional classes
+- Combine Alpine directives with Tailwind classes for interactive components
+- Use Tailwind's `group` and `peer` modifiers with Alpine for complex interactions
+- Extract reusable components that combine Alpine behavior and Tailwind styling
+- Use Alpine's `$refs` to reference elements styled with Tailwind
+
+## Anti-patterns to Avoid
+
+- Don't mix inline styles with Tailwind classes
+- Don't use custom CSS when Tailwind utilities exist
+- Don't use jQuery or direct DOM manipulation with Alpine
+- Don't create complex getter/setter methods when Alpine stores would work
+- Don't use Alpine for heavy computational tasks; offload to Web Workers
+- Don't overuse `!important` in Tailwind (use `!` modifier sparingly)

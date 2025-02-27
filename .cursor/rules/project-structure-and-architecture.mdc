@@ -1,0 +1,158 @@
+---
+description: Components and Features in the Repository. Use if you implement a new component or feature, or if you need to understand how components work together
+globs: 
+---
+# Components and Features in the Repository
+
+## Components vs. Features
+
+In this repository, there's a clear architectural distinction between:
+
+1. **Components**: Reusable UI elements that can be used across the application. These are located in `src/lib/components/` and are more generic in nature.
+
+2. **Features**: Higher-level modules that implement specific application functionality. Each feature is organized in a directory structure with component, service, and state subdirectories.
+
+## Architecture Overview
+
+The application uses a modular architecture with:
+
+1. Alpine.js as the core framework for reactivity and UI manipulation
+2. Custom component system built on top of Alpine.js using the `XComponent` class
+3. State management using Alpine.js stores
+4. Tailwind CSS for styling
+
+## XComponent: The Core Building Block
+
+The `XComponent.ts` file defines the foundation of the component system:
+
+1. It creates a wrapper around Alpine.js components that combines HTML templates with JavaScript functionality
+2. It registers custom HTML elements that can be used in the application's HTML
+3. It handles the lifecycle of components and their data attributes
+
+The key parts of `XComponent.ts` are:
+
+- `XComponent` class: Creates a component by combining an HTML template with an Alpine.js component
+- `registerXComponent`: Registers a component as a custom HTML element
+- `addComponent`: Registers an Alpine.js component with a specific naming convention
+
+## How Components Are Integrated
+
+In `main.ts`, components are integrated into the application through these steps:
+
+1. Component factories are imported from their respective files
+2. `addComponent()` is called for each component to register it with Alpine.js
+3. Alpine.js is initialized with `Alpine.start()`
+4. On `DOMContentLoaded`, all components with the `x-component` attribute are registered as custom elements
+
+For example:
+
+```typescript
+addComponent(aboutModalFactory());
+addComponent(developerModalFactory());
+addComponent(shareButtonFactory());
+addComponent(toastRackFactory());
+addComponent(toggleSwitchFactory());
+```
+
+## Feature Structure
+
+Each feature follows a consistent directory structure:
+
+1. **component/**: Contains the UI elements (HTML templates and TypeScript files)
+2. **service/**: Contains business logic and services
+3. **state/**: Contains Alpine.js stores for state management
+
+For example, the `About` feature has:
+
+- `AboutModal.html`: The HTML template
+- `AboutModal.ts`: The component logic
+- `AboutStore.ts`: The state management
+
+## State Management
+
+State is managed using Alpine.js stores, which are defined in the state directories:
+
+```typescript
+// AboutStore.ts
+const _store = {
+  isOpen: false,
+};
+
+Alpine.store("about", _store);
+
+export const aboutStore = Alpine.store("about") as typeof _store;
+```
+
+These stores can be accessed in HTML templates using `$store`:
+
+```html
+<div @click="$store.about.isOpen = !$store.about.isOpen"></div>
+```
+
+## Component Creation Pattern
+
+Components follow a factory pattern:
+
+1. Import the HTML template
+2. Define a component function that returns an object with properties and methods
+3. Create and return a new `XComponent` instance
+
+For example:
+
+```typescript
+export function aboutModalFactory() {
+  function component() {
+    return {
+      config,
+      devConfig: new DevloperConfig(),
+      handleDevModeClick() {
+        this.devConfig.handleClick();
+        if (developerConfigStore.isOpen) {
+          aboutStore.isOpen = false;
+        }
+      },
+    };
+  }
+  return new XComponent(template, "about-modal", component);
+}
+```
+
+## Usage in index.html
+
+In the `index.html` file, components are used as custom HTML elements:
+
+```html
+<x-toast-rack></x-toast-rack>
+<x-about-modal></x-about-modal>
+<x-developer-modal></x-developer-modal>
+```
+
+The application also uses Alpine.js directives extensively:
+
+- `x-data`: Initializes Alpine.js components
+- `x-show`: Conditionally shows elements
+- `x-transition`: Adds transitions to elements
+- `:class`: Dynamically sets classes
+- `@click`: Adds event listeners
+
+## Integration with the Prototype
+
+The attached `index.html` from the Audify prototype contains a complete text-to-speech converter application. To integrate this into the current Alpine.js structure, you would:
+
+1. Create a new feature directory (e.g., `src/features/TextToSpeech`)
+2. Split the HTML into component templates
+3. Create corresponding TypeScript files for component logic
+4. Define stores for state management
+5. Register the components in `main.ts`
+6. Use the components in the application's `index.html`
+
+## Summary
+
+This repository implements a well-structured frontend application using Alpine.js with:
+
+1. A custom component system (`XComponent`) that bridges HTML templates and Alpine.js components
+2. A clear separation between reusable components and application-specific features
+3. Organized state management using Alpine.js stores
+4. A consistent directory structure for features (component, service, state)
+
+The architecture makes it easy to add new features while maintaining a clean separation of concerns. The prototype's functionality can be integrated by creating new feature modules following the established patterns.
