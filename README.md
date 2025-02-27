@@ -121,6 +121,15 @@ For any questions or feedback, please contact [me@heye.dev](mailto:me@heye.dev).
 
 # Contribution Notes
 
+## Staging Branch Strategy
+
+We use a **staging** branch to integrate and test new features before merging into the **main** branch.
+
+1. **Development**: Create branches from `staging` (e.g., `feature/my-new-feature`, `fix/my-bug-fix`).
+2. **Merging to Staging**: Merge completed features into `staging` via pull requests for review.
+3. **Continuous Integration**: CI runs on `staging` to ensure all tests pass before release.
+4. **Release Process**: When merging to `staging`, `release-please` will create a PR to merge into `main`.
+
 ## HTML/Tailwind CSS
 
 ### Recommended Order for Tailwind CSS Classes
