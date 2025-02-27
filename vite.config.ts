@@ -1,17 +1,17 @@
 import path from "path";
 import { watchAndRun } from "vite-plugin-watch-and-run";
-
 import dotenv from "dotenv";
-
 import SvgSpritePlugin from "vite-plugin-svg-sprite";
+import { UserConfig } from "vite";
 
+dotenv.config({ path: `.env` });
 dotenv.config({ path: `.env.${process.env.NODE_ENV}` });
 process.env.BROWSER = "Google Chrome";
 
-/** @type {import("vite").UserConfig} */
-const config = {
+/** @type {UserConfig} */
+const config: UserConfig = {
   server: {
-    port: process.env.PORT,
+    port: Number(process.env.PORT),
   },
   plugins: [
     SvgSpritePlugin({
