@@ -3,7 +3,8 @@ name: Release Please
 on:
   push:
     branches:
-      - "staging*"
+      - "staging"
+      - "staging/*"
       - "fix/ci-pipeline"
 
 jobs:
@@ -22,7 +23,7 @@ jobs:
         with:
           token: ${{ github.token }}
           release-type: node
-          target-branch: main
+          target-branch: staging
 
       - name: Display outputs
         if: steps.release.outputs.release_created

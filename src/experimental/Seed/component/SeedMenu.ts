@@ -3,7 +3,7 @@ import { XComponent, XAlpineComponent } from "../../../lib/XComponent";
 import { mnemonicsStore } from "../../Mnemonics";
 import { Seed, seedStore } from "../state/SeedStore";
 
-import * as bip39 from "bip39";
+import bip39 from "bip39";
 import { Buffer } from "buffer";
 (globalThis as unknown as { Buffer: typeof Buffer }).Buffer = Buffer; // For bip39
 
