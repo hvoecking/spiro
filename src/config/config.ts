@@ -10,7 +10,7 @@ function parseBoolean(str: string): boolean {
 export const config = {
   appMode: import.meta.env.VITE_APP_MODE as AppMode,
 
-  appVersion: import.meta.env.VITE_APP_VERSION,
+  appVersion: import.meta.env.PACKAGE_VERSION,
 
   autoAdvanceDelaySeconds: parseFloat(import.meta.env.VITE_AUTO_ADVANCE_DELAY_SECONDS),
 
