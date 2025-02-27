@@ -3,7 +3,9 @@ name: CI
 on:
   push:
     branches:
-      - "staging*"
+      - "staging"
+      - "staging/*"
+      - "fix/ci-pipeline"
   pull_request:
     branches:
       - main
@@ -19,10 +21,10 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: "25"
+          node-version: "22"
 
       - name: Install dependencies
         run: npm install
 
       - name: Run CI script
-        run: npm run ci
+        run: cat /home/runner/work/spiro/spiro/cypress.config.ts && npm run ci
