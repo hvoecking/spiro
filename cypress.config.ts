@@ -31,13 +31,11 @@ export default defineConfig({
   component: {
     async devServer(devServerConfig) {
       const viteConfig = await getViteConfig();
-      // Merge the configurations without type casting
-      const mergedConfig = {
+      return devServer({
         ...devServerConfig,
         framework: "cypress-ct-alpine-js",
         viteConfig,
-      };
-      return devServer(mergedConfig);
+      });
     },
   },
 });
