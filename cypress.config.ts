@@ -1,11 +1,21 @@
 import { devServer } from "@cypress/vite-dev-server";
 import { defineConfig } from "cypress";
+import { fileURLToPath } from "url";
+import { dirname, resolve } from "path";
 
-import viteConfig from "./vite.config.ts";
+// Get the current file's directory
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 import dotenv from "dotenv";
 
 dotenv.config({ path: `.env.${process.env.NODE_ENV}` });
+
+// Import Vite config using dynamic import
+const getViteConfig = async () => {
+  const viteConfig = await import(resolve(__dirname, "./vite.config.ts"));
+  return viteConfig.default;
+};
 
 export default defineConfig({
   // A bug in cypress causes reloads with incomplete DOM which causes an infinite loop
@@ -19,13 +29,15 @@ export default defineConfig({
     PORT: process.env.PORT,
   },
   component: {
-    devServer(devServerConfig) {
-      return devServer({
+    async devServer(devServerConfig) {
+      const viteConfig = await getViteConfig();
+      // Merge the configurations without type casting
+      const mergedConfig = {
         ...devServerConfig,
-        // Using standard framework configuration
         framework: "cypress-ct-alpine-js",
-        viteConfig: viteConfig,
-      });
+        viteConfig,
+      };
+      return devServer(mergedConfig);
     },
   },
 });
