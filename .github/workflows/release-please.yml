@@ -3,7 +3,9 @@ name: Release Please
 on:
   push:
     branches:
-      - "staging*"
+      - "staging"
+      - "staging/*"
+      - "fix/ci-pipeline"
 
 jobs:
   release-please:
@@ -16,12 +18,12 @@ jobs:
       tag_name: ${{ steps.release.outputs.tag_name }}
     steps:
       - name: Run release-please to generate release PR
-        uses: googleapis/release-please-action@v3
+        uses: googleapis/release-please-action@v4
         id: release
         with:
           token: ${{ github.token }}
           release-type: node
-          package-name: spiro
+          target-branch: staging
 
       - name: Display outputs
         if: steps.release.outputs.release_created
@@ -43,7 +45,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 21
+          node-version: 22
 
       - name: Install ImageMagick
         run: |

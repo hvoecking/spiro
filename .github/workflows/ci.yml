@@ -3,7 +3,9 @@ name: CI
 on:
   push:
     branches:
-      - "staging*"
+      - "staging"
+      - "staging/*"
+      - "fix/ci-pipeline"
   pull_request:
     branches:
       - main
@@ -19,7 +21,12 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: "16"
+          node-version: 22
+
+      - name: Install ImageMagick
+        run: |
+          sudo rm -f /var/lib/man-db/auto-update # Disable man db rebuild
+          sudo apt-get install -y --no-install-recommends imagemagick-6.q16
 
       - name: Install dependencies
         run: npm install
