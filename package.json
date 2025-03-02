@@ -68,7 +68,7 @@
     "test:cypress": "node scripts/test-cypress.js",
     "test:jest": "jest",
     "test": "jest",
-    "ci": "npm run test:all && npm run build"
+    "ci": "npm run build && npm run test:all"
   },
   "private": true,
   "husky": {
