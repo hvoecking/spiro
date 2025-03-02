@@ -7,7 +7,7 @@ import { dirname, resolve } from "path";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-import dotenv from "dotenv";
+import * as dotenv from "dotenv";
 
 dotenv.config({ path: `.env.${process.env.NODE_ENV}` });
 
