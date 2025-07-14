@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.2.1](https://github.com/hvoecking/spiro/compare/v0.2.0...v0.2.1) (2025-07-14)
+
+
+### Bug Fixes
+
+* **icons:** generate icons reliably ([bbbc7df](https://github.com/hvoecking/spiro/commit/bbbc7dfd4cbfbec4d8ea625888d4b43deb39db05))
+
 ## [0.2.0](https://github.com/hvoecking/spiro/compare/v0.1.1...v0.2.0) (2025-02-27)
 
 
