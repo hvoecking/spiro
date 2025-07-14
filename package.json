@@ -51,7 +51,7 @@
     "_build:as": "npm run _build:as:debug && npm run _build:as:release",
     "_dev:cypress:component": "NODE_ENV=test cypress open --component $(dotenv -cp CYPRESS_ARGS)",
     "_dev:cypress:e2e": "NODE_ENV=test cypress open --e2e $(dotenv -cp CYPRESS_ARGS)",
-    "_test:cypress": "NODE_ENV=test cypress run $(dotenv -cp CYPRESS_ARGS)",
+    "_test:cypress": "NODE_ENV=test ts-node ./node_modules/.bin/cypress run $(dotenv -cp CYPRESS_ARGS)",
     "_test:vite": "NODE_ENV=test vite --mode test",
     "build": "npm run _build:as && ./scripts/icons.sh && tsc && vite build",
     "commit": "cz",

@@ -1,14 +1,14 @@
 import { devServer } from "@cypress/vite-dev-server";
 import { defineConfig } from "cypress";
 
-import viteConfig from "./vite.config";
+import viteConfig from "./vite.config.ts";
 
-import * as dotenv from "dotenv";
+import dotenv from "dotenv";
 
 dotenv.config({ path: `.env.${process.env.NODE_ENV}` });
 
 export default defineConfig({
-  // A bug in cypress causes reloads with incomplete DOM which causes an infinet loop
+  // A bug in cypress causes reloads with incomplete DOM which causes an infinite loop
   // of exceptions. Therefore, we set this to 0 to avoid the reloads.
   e2e: {
     setupNodeEvents() {
@@ -22,7 +22,8 @@ export default defineConfig({
     devServer(devServerConfig) {
       return devServer({
         ...devServerConfig,
-        framework: "cypress-ct-alpine-js" as "vue",
+        // Using standard framework configuration
+        framework: "cypress-ct-alpine-js",
         viteConfig: viteConfig,
       });
     },
