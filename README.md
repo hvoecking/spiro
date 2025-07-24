@@ -1,6 +1,7 @@
 # SPIRO
 
 [![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
+[![Netlify Status](https://api.netlify.com/api/v1/badges/0faf797c-6bb6-414c-a023-b8e19f9c5ce4/deploy-status)](https://app.netlify.com/projects/spiro-heye-dev/deploys)
 
 ## Table of Contents
 
