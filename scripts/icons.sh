@@ -55,6 +55,11 @@ generate-icons() (
     done
     clean-icons
     mv "$tmp_build" $(dirname "$BUILD_DIR")
+    # Generate favicon in project root for Vite to process
+    convert "$ASSETS_DIR/is-shape-mode-false.png" \
+        -background transparent \
+        -define icon:auto-resize=64,48,32,16 \
+        "favicon.ico"
 )
 
 clean-icons() {
