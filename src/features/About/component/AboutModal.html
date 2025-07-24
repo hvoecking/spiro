@@ -13,7 +13,7 @@
       x-transition:leave-end="opacity-0 blur"
       class="
         fixed top-1/2 left-1/2 z-30 -translate-x-1/2 -translate-y-1/2
-        w-96 h-60
+        w-96 h-74
         rounded-lg
         backdrop-blur-lg
       "
@@ -35,7 +35,7 @@
       "
       data-test-id="about"
     >
-      <div class="bg-black bg-opacity-50 rounded-lg p-4 w-96 h-60 text-white">
+      <div class="bg-black bg-opacity-50 rounded-lg p-4 w-96 h-74 text-white">
         <h4
           @click="handleDevModeClick()"
           class="text-2xl font-semibold mb-4 cursor-pointer"
@@ -53,6 +53,11 @@
 
         <p class="text-xs mt-4 text-red-400">
           <strong>Note:</strong> Spiro seeds are not Bitcoin seeds. Do not use your Bitcoin seed here.
+        </p>
+
+        <p class="text-xs mt-4">
+          <a href="https://fascinating-meerkat-fad5f4.netlify.app/imprint" target="_blank" class="text-blue-400 hover:underline">Imprint</a> / <a href="https://fascinating-meerkat-fad5f4.netlify.app/impressum" target="_blank" class="text-blue-400 hover:underline">Impressum</a>.
+          <a href="https://fascinating-meerkat-fad5f4.netlify.app/privacy_policy" target="_blank" class="text-blue-400 hover:underline">Privacy</a> / <a href="https://fascinating-meerkat-fad5f4.netlify.app/datenschutz" target="_blank" class="text-blue-400 hover:underline">Datenschutzerklärung</a>.
         </p>
 
         <button
